@@ -10,18 +10,18 @@ public class EulerIntegrationAlgorithm implements IntegrationAlgorithm {
     }
 
     @Override
-    public Position calculatePosition(Particle particle, BigDecimal time, BigDecimal step) {
+    public Position calculatePosition(Particle particle, Step step) {
         return new Position(
-                this.calculatePosition(particle, particle.getVelocity().getxSpeed(), particle.getPosition().getX(), step, this.forceCalculator.calculateX(particle)),
-                this.calculatePosition(particle, particle.getVelocity().getySpeed(), particle.getPosition().getY(), step, this.forceCalculator.calculateY(particle))
+                this.calculatePosition(particle, particle.getVelocity().getxSpeed(), particle.getPosition().getX(), step.getRelativeTime(), this.forceCalculator.calculateX(particle)),
+                this.calculatePosition(particle, particle.getVelocity().getySpeed(), particle.getPosition().getY(), step.getRelativeTime(), this.forceCalculator.calculateY(particle))
         );
     }
 
     @Override
-    public Velocity calculateVelocity(Particle particle, BigDecimal time, BigDecimal step) {
+    public Velocity calculateVelocity(Particle particle, Step step) {
         return new Velocity(
-                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step, this.forceCalculator.calculateX(particle)),
-                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step, this.forceCalculator.calculateY(particle))
+                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step.getRelativeTime(), this.forceCalculator.calculateX(particle)),
+                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step.getRelativeTime(), this.forceCalculator.calculateY(particle))
         );
     }
 
