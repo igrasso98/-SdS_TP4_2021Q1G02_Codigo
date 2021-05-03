@@ -1,5 +1,7 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
+import java.math.BigDecimal;
+
 public class Color {
     private final BigDecimal red;
     private final BigDecimal green;

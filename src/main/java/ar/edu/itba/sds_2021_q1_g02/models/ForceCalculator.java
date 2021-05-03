@@ -6,4 +6,8 @@ public interface ForceCalculator {
     BigDecimal calculateX(Particle particle);
 
     BigDecimal calculateY(Particle particle);
+
+    BigDecimal calculate(BigDecimal rn_2, BigDecimal rn_1);
+
+    boolean isVelocityDependant();
 }

@@ -1,9 +1,6 @@
 package ar.edu.itba.sds_2021_q1_g02;
 
-import ar.edu.itba.sds_2021_q1_g02.models.Color;
-import ar.edu.itba.sds_2021_q1_g02.models.Particle;
-import ar.edu.itba.sds_2021_q1_g02.models.ParticleCharge;
-import ar.edu.itba.sds_2021_q1_g02.models.Position;
+import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import javafx.util.Pair;
@@ -17,9 +14,6 @@ public class App {
     public static void main(String[] args) throws ParseException, IOException {
         CommandParser.getInstance().parse(args);
 
-        System.out.println("Parsing particles");
-        Pair<List<Particle>, Integer> particles =
-                ParticleParser.parseParticles(CommandParser.getInstance().getInputPath());
 
         App.oscillatorSimulation();
 
@@ -120,5 +114,15 @@ public class App {
         } else {
             return new Color(0, 1.0, 0);
         }
+    }
+
+    private void testGearPredictorCorrector() {
+        GearPredictorCorrectorIntegrationAlgorithm integrationAlgorithm =
+                new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(Math.pow(10, 4),
+                        100));
+        integrationAlgorithm.calculatePosition(new Particle(1, BigDecimal.valueOf(1), BigDecimal.valueOf(1),
+                        new Position(BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
+                        new Velocity(BigDecimal.valueOf(-(1.0 * 100.0) / (2.0 * 1.0)), BigDecimal.valueOf(0))),
+                BigDecimal.valueOf(0.01));
     }
 }
