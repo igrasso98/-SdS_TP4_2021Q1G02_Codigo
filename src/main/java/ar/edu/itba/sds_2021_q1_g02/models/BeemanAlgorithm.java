@@ -1,8 +1,11 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
+import javafx.util.Pair;
+
 import java.math.BigDecimal;
 
 public class BeemanAlgorithm implements IntegrationAlgorithm {
+    private final IntegrationAlgorithm eulerIntegration;
     private final ForceCalculator forceCalculator;
     private Acceleration lastAcceleration;
     private Position lastPosition;
@@ -12,11 +15,18 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
         this.lastAcceleration = new Acceleration(null, null);
         this.lastPosition = new Position(null, null);
         this.lastVelocity = new Velocity(null, null);
+        this.eulerIntegration = new EulerIntegrationAlgorithm(forceCalculator);
     }
-    private void calculateLastAcceleration(Particle particle, Step step){
 
-    }
     @Override
+    public Pair<Position, Velocity> perform(Particle particle, Step step) {
+
+        return null;
+    }
+
+
+
+
     public Position calculatePosition(Particle particle, Step step) {
         if(this.lastAcceleration.getxAcceleration() == null){
             calculateLastAcceleration(particle, step);
@@ -63,12 +73,18 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
                 .subtract(BigDecimal.valueOf(1/6).multiply(lastAcceleration).multiply(step.pow(2)));
     }
 
-    private BigDecimal calculateVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
-        BigDecimal predictedVel = calculatePredictedVelocity(particle, velocity, step, force, lastAcceleration);
-//        Medio perdida aca
-        return velocity
-                .add(BigDecimal.valueOf(1/3));
+//    private BigDecimal calculateVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
+//        BigDecimal predictedVel = calculatePredictedVelocity(particle, velocity, step, force, lastAcceleration);
+////        Medio perdida aca
+//        return velocity
+//                .add(BigDecimal.valueOf(1/3));
+//    }
+
+
+    private BigDecimal calculateCorrectedVelocity() {
+
     }
+
     private BigDecimal calculatePredictedVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
         return velocity
                 .add(BigDecimal.valueOf(2/3).multiply(BigDecimalDivision.divide(force, particle.getMass())).multiply(step)).

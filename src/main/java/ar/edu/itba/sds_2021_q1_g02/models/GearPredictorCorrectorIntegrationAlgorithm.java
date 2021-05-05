@@ -20,15 +20,12 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         this.forceCalculator = forceCalculator;
     }
 
-    public Position calculatePosition(Particle particle, Step step) {
-        List<Pair<BigDecimal, BigDecimal>> corrections = this.predictAndCorrect(particle, step);
-        return new Position(corrections.get(0).getKey(), corrections.get(0).getValue());
-    }
-
     @Override
-    public Velocity calculateVelocity(Particle particle, Step step) {
+    public Pair<Position, Velocity> perform(Particle particle, Step step) {
         List<Pair<BigDecimal, BigDecimal>> corrections = this.predictAndCorrect(particle, step);
-        return new Velocity(corrections.get(1).getKey(), corrections.get(1).getValue());
+        Position newPosition = new Position(corrections.get(0).getKey(), corrections.get(0).getValue());
+        Velocity newVelocity = new Velocity(corrections.get(1).getKey(), corrections.get(1).getValue());
+        return new Pair<>(newPosition, newVelocity);
     }
 
     private List<Pair<BigDecimal, BigDecimal>> predictAndCorrect(Particle particle, Step step) {
