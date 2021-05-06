@@ -3,6 +3,7 @@ package ar.edu.itba.sds_2021_q1_g02;
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
+import ar.edu.itba.sds_2021_q1_g02.serializer.ConsoleSerializer;
 import javafx.util.Pair;
 import org.apache.commons.cli.ParseException;
 
@@ -12,8 +13,7 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) throws ParseException, IOException {
-        CommandParser.getInstance().parse(args);
-
+//        CommandParser.getInstance().parse(args);
 
         App.oscillatorSimulation();
 
@@ -95,17 +95,44 @@ public class App {
     }
 
     private static void oscillatorSimulation() {
-        Oscillator oscillator = new Oscillator(new Particle(
-//                1,
-//                BigDecimal.valueOf(1),
-//                BigDecimal.valueOf(70),
-//                new Position(
-//                        BigDecimal.valueOf()
-//                )
+        Oscillator oscillator = new Oscillator(
+                new Particle(
+                        1,
+                        BigDecimal.valueOf(1),
+                        BigDecimal.valueOf(70),
+                        new Position(
+                                BigDecimal.ONE,
+                                BigDecimal.ZERO
+                        ),
+                        new Velocity(
+                                BigDecimal.valueOf(-50),
+                                BigDecimal.ZERO
+                        )
+                ),
+                new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(BigDecimal.TEN.pow(4), BigDecimal.valueOf(100))),
+                BigDecimal.valueOf(0.001)
+        );
+
+        oscillator.addSerializer(new ConsoleSerializer(
+                (systemParticles, integrationAlgorithm) -> {
+                    return "Using integration algorithm: " + integrationAlgorithm.getClass().getName();
+                },
+                (stepParticles, step) -> {
+                    return "** Step = " + step.getStep() +
+                            "; dT = " + String.format("%.8fs", step.getRelativeTime().doubleValue());
+                },
+                (particle, step) -> {
+                    return particle.getId() + " | " +
+                            String.format("%.5fm", particle.getPosition().getX().doubleValue()) +
+                            " | " +
+                            String.format("%.5fm/s", particle.getVelocity().getxSpeed());
+                },
+                BigDecimal.valueOf(1)
         ));
 
         System.out.println("Running simulation 1");
         oscillator.simulate();
+        System.out.println("Ended simulation 1");
     }
 
     private static Color getParticleColor(Particle particle) {
@@ -116,13 +143,13 @@ public class App {
         }
     }
 
-    private void testGearPredictorCorrector() {
-        GearPredictorCorrectorIntegrationAlgorithm integrationAlgorithm =
-                new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(Math.pow(10, 4),
-                        100));
-        integrationAlgorithm.calculatePosition(new Particle(1, BigDecimal.valueOf(1), BigDecimal.valueOf(1),
-                        new Position(BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
-                        new Velocity(BigDecimal.valueOf(-(1.0 * 100.0) / (2.0 * 1.0)), BigDecimal.valueOf(0))),
-                BigDecimal.valueOf(0.01));
-    }
+//    private void testGearPredictorCorrector() {
+//        GearPredictorCorrectorIntegrationAlgorithm integrationAlgorithm =
+//                new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(Math.pow(10, 4),
+//                        100));
+//        integrationAlgorithm.calculatePosition(new Particle(1, BigDecimal.valueOf(1), BigDecimal.valueOf(1),
+//                        new Position(BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
+//                        new Velocity(BigDecimal.valueOf(-(1.0 * 100.0) / (2.0 * 1.0)), BigDecimal.valueOf(0))),
+//                BigDecimal.valueOf(0.01));
+//    }
 }

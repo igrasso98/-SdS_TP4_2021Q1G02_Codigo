@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -30,7 +31,7 @@ public abstract class ParticleParser {
                 data = myReader.nextLine();
                 String[] info = data.split("\t");
                 // int id, BigDecimal radius,BigDecimal mass,Position position, Velocity velocity
-                Particle particle = new Particle(i,Double.parseDouble(info[0]), Integer.parseInt(info[1]), new Position(Double.parseDouble(info[2]), Double.parseDouble(info[3])), new Velocity(Double.parseDouble(info[4]), Double.parseDouble(info[5])));
+                Particle particle = new Particle(i, BigDecimal.valueOf(Double.parseDouble(info[0])), BigDecimal.valueOf(Double.parseDouble(info[1])), new Position(BigDecimal.valueOf(Double.parseDouble(info[2])), BigDecimal.valueOf(Double.parseDouble(info[3]))), new Velocity(BigDecimal.valueOf(Double.parseDouble(info[4])), BigDecimal.valueOf(Double.parseDouble(info[5]))));
                 particles.add(particle);
                 i++;
             }

@@ -1,27 +1,25 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.math.BigDecimal;
-
 public class Color {
-    private final BigDecimal red;
-    private final BigDecimal green;
-    private final BigDecimal blue;
+    private final double red;
+    private final double green;
+    private final double blue;
 
-    public Color(BigDecimal red, BigDecimal green, BigDecimal blue) {
+    public Color(double red, double green, double blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
 
-    public BigDecimal getRed() {
+    public double getRed() {
         return this.red;
     }
 
-    public BigDecimal getGreen() {
+    public double getGreen() {
         return this.green;
     }
 
-    public BigDecimal getBlue() {
+    public double getBlue() {
         return this.blue;
     }
 }

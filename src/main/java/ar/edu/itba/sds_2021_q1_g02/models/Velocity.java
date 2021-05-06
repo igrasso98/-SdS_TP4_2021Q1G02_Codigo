@@ -27,4 +27,8 @@ public class Velocity {
     public String toString() {
         return String.format("(%.5f, %.5f)", this.xSpeed, this.ySpeed);
     }
+
+    public boolean isZero() {
+        return this.xSpeed.equals(BigDecimal.ZERO) && this.ySpeed.equals(BigDecimal.ZERO);
+    }
 }
