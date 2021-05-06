@@ -7,9 +7,11 @@ import org.apache.commons.cli.ParseException;
 import java.io.IOException;
 
 public class App {
+    private static final double OSCILLATOR_DT = 0.0001;
+    private static final double OSCILLATOR_SERIALIZE_EVERY = 0.01;
     private static final OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
             step -> "R:/output/oscillator.tsv",
-            0.01
+            App.OSCILLATOR_SERIALIZE_EVERY
     );
     private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10e4, 100);
 
@@ -175,7 +177,7 @@ public class App {
         return new Oscillator(
                 App.getOscillatorParticle(),
                 integrationAlgorithm,
-                0.001,
+                App.OSCILLATOR_DT,
                 5
         );
     }
