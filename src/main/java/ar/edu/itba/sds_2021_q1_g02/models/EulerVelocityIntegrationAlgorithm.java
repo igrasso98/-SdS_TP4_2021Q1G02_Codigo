@@ -2,7 +2,6 @@ package ar.edu.itba.sds_2021_q1_g02.models;
 
 import javafx.util.Pair;
 
-import java.math.BigDecimal;
 
 public class EulerVelocityIntegrationAlgorithm implements IntegrationAlgorithm {
     private final ForceCalculator forceCalculator;
@@ -25,14 +24,13 @@ public class EulerVelocityIntegrationAlgorithm implements IntegrationAlgorithm {
         return new Pair<>(newPosition, newVelocity);
     }
 
-    private BigDecimal calculatePosition(Particle particle, BigDecimal velocity, BigDecimal position, BigDecimal step, BigDecimal force) {
+    private double calculatePosition(Particle particle, double velocity, double position, double step, double force) {
         return position
-                .add(step.multiply(velocity))
-                .add(BigDecimalDivision.divide(step.pow(2), particle.getMass().multiply(BigDecimal.valueOf(2))).multiply(force));
+                + step * velocity
+                + Math.pow(step, 2) / (particle.getMass() * 2) * force;
     }
 
-    private BigDecimal calculateVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force) {
-        return velocity
-                .add(BigDecimalDivision.divide(step, particle.getMass()).multiply(force));
+    private double calculateVelocity(Particle particle, double velocity, double step, double force) {
+        return velocity + (step / particle.getMass()) * force;
     }
 }

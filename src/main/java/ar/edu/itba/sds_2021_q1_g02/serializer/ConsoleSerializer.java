@@ -4,7 +4,6 @@ import ar.edu.itba.sds_2021_q1_g02.models.IntegrationAlgorithm;
 import ar.edu.itba.sds_2021_q1_g02.models.Particle;
 import ar.edu.itba.sds_2021_q1_g02.models.Step;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 
 public class ConsoleSerializer extends Serializer {
@@ -14,7 +13,7 @@ public class ConsoleSerializer extends Serializer {
     private final StepFormatter stepFormatter;
     private final ParticleFormatter particleFormatter;
 
-    public ConsoleSerializer(SystemFormatter systemFormatter, StepFormatter stepFormatter, ParticleFormatter particleFormatter, BigDecimal serializeEvery) {
+    public ConsoleSerializer(SystemFormatter systemFormatter, StepFormatter stepFormatter, ParticleFormatter particleFormatter, double serializeEvery) {
         super(serializeEvery);
 
         this.systemFormatter = systemFormatter;

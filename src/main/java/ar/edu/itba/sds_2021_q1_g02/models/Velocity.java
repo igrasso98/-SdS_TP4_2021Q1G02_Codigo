@@ -1,21 +1,20 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.math.BigDecimal;
 
 public class Velocity {
-    private final BigDecimal xSpeed;
-    private final BigDecimal ySpeed;
+    private final double xSpeed;
+    private final double ySpeed;
 
-    public Velocity(BigDecimal xSpeed, BigDecimal ySpeed) {
+    public Velocity(double xSpeed, double ySpeed) {
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
     }
 
-    public BigDecimal getxSpeed() {
+    public double getxSpeed() {
         return this.xSpeed;
     }
 
-    public BigDecimal getySpeed() {
+    public double getySpeed() {
         return this.ySpeed;
     }
 
@@ -28,7 +27,7 @@ public class Velocity {
         return String.format("(%.5f, %.5f)", this.xSpeed, this.ySpeed);
     }
 
-    public boolean isZero() {
-        return this.xSpeed.equals(BigDecimal.ZERO) && this.ySpeed.equals(BigDecimal.ZERO);
+    public boolean isZero(double epsilon) {
+        return Math.abs(this.xSpeed) <= epsilon && Math.abs(this.ySpeed) <= epsilon;
     }
 }

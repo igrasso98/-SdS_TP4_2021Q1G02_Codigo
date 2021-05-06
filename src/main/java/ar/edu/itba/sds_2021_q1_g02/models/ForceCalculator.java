@@ -1,13 +1,12 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.math.BigDecimal;
 
 public interface ForceCalculator {
-    BigDecimal calculateX(Particle particle);
+    double calculateX(Particle particle);
 
-    BigDecimal calculateY(Particle particle);
+    double calculateY(Particle particle);
 
-    BigDecimal calculate(BigDecimal rn_2, BigDecimal rn_1);
+    double calculate(double rn_2, double rn_1);
 
     boolean isVelocityDependant();
 }

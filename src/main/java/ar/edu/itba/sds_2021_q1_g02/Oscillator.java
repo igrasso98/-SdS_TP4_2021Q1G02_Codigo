@@ -4,16 +4,17 @@ import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.serializer.Serializer;
 import javafx.util.Pair;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 public class Oscillator {
+    private final static double EPSILON = 1e-10;
+
     private final Particle particle;
     private final List<Serializer> serializers;
     private final IntegrationAlgorithm integrationAlgorithm;
-    private final BigDecimal dt;
+    private final double dt;
 
-    public Oscillator(Particle particle, IntegrationAlgorithm integrationAlgorithm, BigDecimal dt) {
+    public Oscillator(Particle particle, IntegrationAlgorithm integrationAlgorithm, double dt) {
         this.particle = particle;
         this.serializers = new LinkedList<>();
         this.integrationAlgorithm = integrationAlgorithm;
@@ -29,7 +30,7 @@ public class Oscillator {
         Step step = this.calculateFirstStep();
         this.serialize(step);
 
-        while (!this.particle.getVelocity().isZero() || !step.getPreviousVelocity(this.particle).isZero()) {
+        while (!this.particle.getVelocity().isZero(EPSILON) || !step.getPreviousVelocity(this.particle).isZero(EPSILON)) {
             step = this.simulateStep(step);
             this.serialize(step);
         }
@@ -46,7 +47,7 @@ public class Oscillator {
                 Collections.singletonMap(this.particle, this.particle.getPosition()),
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
-                previousStep.getAbsoluteTime().add(this.dt),
+                previousStep.getAbsoluteTime() + this.dt,
                 previousStep.getStep() + 1
         );
     }

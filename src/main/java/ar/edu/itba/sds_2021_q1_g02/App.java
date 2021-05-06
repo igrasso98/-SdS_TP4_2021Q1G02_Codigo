@@ -4,11 +4,11 @@ import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import ar.edu.itba.sds_2021_q1_g02.serializer.ConsoleSerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
 import javafx.util.Pair;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class App {
@@ -46,25 +46,6 @@ public class App {
 //                dimen
 //        ));
 
-//        GD.addSerializer(new CSVSerializer(
-//                (systemParticles, step) -> "id;\"radius [m]\";\"x [m]\";\"y [m]\";\"mass [kg]\";\"vx [m/s]\";\"vy " +
-//                        "[m/s]\";\"dt [s]\";\"t [s]\";fp",
-//                (particle, step) -> {
-//                    // id (1), radius (1), pos (2), size (1), speed (2), dt (1), t (1)";
-//                    return particle.getId() + ";" +
-//                            particle.getRadius() + ";" +
-//                            particle.getPosition().getX() + ";" +
-//                            particle.getPosition().getY() + ";" +
-//                            particle.getMass() + ";" +
-//                            particle.getVelocity().getxSpeed() + ";" +
-//                            particle.getVelocity().getySpeed() + ";" +
-//                            step.getRelativeTime() + ";" +
-//                            step.getAbsoluteTime() + ";" +
-//                            step.getLeftOccupationFactor();
-//                },
-//                step -> "output/output_" + step + ".csv"
-//        ));
-
 //        GD.addSerializer(new ConsoleSerializer(
 //                (systemParticles, configuration) -> {
 //                    return "Height = " + String.format("%.5f",
@@ -98,41 +79,26 @@ public class App {
         Oscillator oscillator = new Oscillator(
                 new Particle(
                         1,
-                        BigDecimal.valueOf(1),
-                        BigDecimal.valueOf(70),
+                        1,
+                        70,
                         new Position(
-                                BigDecimal.ONE,
-                                BigDecimal.ZERO
+                                1,
+                                0
                         ),
                         new Velocity(
-                                BigDecimal.valueOf(-50),
-                                BigDecimal.ZERO
+                                -50,
+                                0
                         )
                 ),
-                new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(BigDecimal.TEN.pow(4), BigDecimal.valueOf(100))),
-                BigDecimal.valueOf(0.001)
+                new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)),
+                0.001
         );
 
-        oscillator.addSerializer(new ConsoleSerializer(
-                (systemParticles, integrationAlgorithm) -> {
-                    return "Using integration algorithm: " + integrationAlgorithm.getClass().getName();
-                },
-                (stepParticles, step) -> {
-                    return "** Step = " + step.getStep() +
-                            "; dT = " + String.format("%.8fs", step.getRelativeTime().doubleValue());
-                },
-                (particle, step) -> {
-                    return particle.getId() + " | " +
-                            String.format("%.5fm", particle.getPosition().getX().doubleValue()) +
-                            " | " +
-                            String.format("%.5fm/s", particle.getVelocity().getxSpeed());
-                },
-                BigDecimal.valueOf(1)
-        ));
+        App.putOscillatorSerializers(oscillator);
 
-        System.out.println("Running simulation 1");
+        System.out.println("Running oscillator");
         oscillator.simulate();
-        System.out.println("Ended simulation 1");
+        System.out.println("Ended oscillator");
     }
 
     private static Color getParticleColor(Particle particle) {
@@ -143,13 +109,61 @@ public class App {
         }
     }
 
+    private static void putOscillatorSerializers(Oscillator oscillator) {
+        oscillator.addSerializer(new ConsoleSerializer(
+                (systemParticles, integrationAlgorithm) -> {
+                    return "Using integration algorithm: " + integrationAlgorithm.getClass().getName();
+                },
+                (stepParticles, step) -> {
+                    return "** Step = " + step.getStep() +
+                            "; dT = " + String.format("%.8fs", step.getRelativeTime());
+                },
+                (particle, step) -> {
+                    return particle.getId() + " | " +
+                            String.format("%.5fm", particle.getPosition().getX()) +
+                            " | " +
+                            String.format("%.5fm/s", particle.getVelocity().getxSpeed());
+                },
+                1
+        ));
+
+        oscillator.addSerializer(new OvitoSerializer(
+                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
+                        ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
+                (particle, step) -> {
+                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
+                    String s = particle.getId() + "\t" +
+                            particle.getRadius() + "\t" +
+                            particle.getPosition().getX() + "\t" +
+                            particle.getPosition().getY() + "\t" +
+                            particle.getVelocity().getxSpeed() + "\t" +
+                            particle.getVelocity().getySpeed() + "\t" +
+                            particle.getMass() + "\t";
+
+                    if (particle.getId() >= 0) {
+                        Color color = getParticleColor(particle);
+                        s += color.getRed() + "\t" +
+                                color.getGreen() + "\t" +
+                                color.getBlue() + "\t" +
+                                "0.0";
+                    } else {
+                        s += "0.0\t0.0\t0.0\t1.0";
+                    }
+
+                    return s;
+                },
+                step -> "R:/output/output_" + step + ".xyz",
+                0.1
+        ));
+    }
+
 //    private void testGearPredictorCorrector() {
 //        GearPredictorCorrectorIntegrationAlgorithm integrationAlgorithm =
 //                new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(Math.pow(10, 4),
 //                        100));
-//        integrationAlgorithm.calculatePosition(new Particle(1, BigDecimal.valueOf(1), BigDecimal.valueOf(1),
-//                        new Position(BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
-//                        new Velocity(BigDecimal.valueOf(-(1.0 * 100.0) / (2.0 * 1.0)), BigDecimal.valueOf(0))),
-//                BigDecimal.valueOf(0.01));
+//        integrationAlgorithm.calculatePosition(new Particle(1, 1, 1,
+//                        new Position(1, 0),
+//                        new Velocity(-(1.0 * 100.0 / (2.0 * 1.0)), 0)),
+//                0.01);
 //    }
 }

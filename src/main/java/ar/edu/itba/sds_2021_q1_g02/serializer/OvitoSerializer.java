@@ -3,7 +3,6 @@ package ar.edu.itba.sds_2021_q1_g02.serializer;
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 
 import java.io.*;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,7 +11,7 @@ public class OvitoSerializer extends Serializer {
     private final ParticleFormatter particleFormatter;
     private final FileFormatter fileFormatter;
 
-    public OvitoSerializer(StepFormatter stepFormatter, ParticleFormatter particleFormatter, FileFormatter fileFormatter, BigDecimal serializeEvery) {
+    public OvitoSerializer(StepFormatter stepFormatter, ParticleFormatter particleFormatter, FileFormatter fileFormatter, double serializeEvery) {
         super(serializeEvery);
 
         this.stepFormatter = stepFormatter;

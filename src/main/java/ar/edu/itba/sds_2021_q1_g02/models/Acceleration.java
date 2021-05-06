@@ -1,21 +1,20 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.math.BigDecimal;
 
 public class Acceleration {
-    private final BigDecimal xAcceleration;
-    private final BigDecimal yAcceleration;
+    private final double xAcceleration;
+    private final double yAcceleration;
 
-    public Acceleration(BigDecimal xAcceleration, BigDecimal yAcceleration) {
+    public Acceleration(double xAcceleration, double yAcceleration) {
         this.xAcceleration = xAcceleration;
         this.yAcceleration = yAcceleration;
     }
 
-    public BigDecimal getxAcceleration() {
+    public double getxAcceleration() {
         return this.xAcceleration;
     }
 
-    public BigDecimal getyAcceleration() {
+    public double getyAcceleration() {
         return this.yAcceleration;
     }
 

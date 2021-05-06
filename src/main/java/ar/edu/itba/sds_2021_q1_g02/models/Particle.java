@@ -1,6 +1,5 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -8,18 +7,18 @@ import java.util.Set;
 
 public class Particle {
     private final int id;
-    private final BigDecimal radius;
-    private final BigDecimal mass;
+    private final double radius;
+    private final double mass;
     private final Set<Particle> neighbors;
     private Position position;
     private Velocity velocity;
     private ParticleCharge charge;
 
-    public Particle(int id, BigDecimal radius, BigDecimal mass, Position position, Velocity velocity) {
+    public Particle(int id, double radius, double mass, Position position, Velocity velocity) {
         this(id, radius, mass, position, velocity, null);
     }
 
-    public Particle(int id, BigDecimal radius, BigDecimal mass, Position position, Velocity velocity, ParticleCharge charge) {
+    public Particle(int id, double radius, double mass, Position position, Velocity velocity, ParticleCharge charge) {
         this.id = id;
         this.radius = radius;
         this.neighbors = new HashSet<>();
@@ -33,11 +32,11 @@ public class Particle {
         return this.id;
     }
 
-    public BigDecimal getRadius() {
+    public double getRadius() {
         return this.radius;
     }
 
-    public BigDecimal getMass() {
+    public double getMass() {
         return this.mass;
     }
 
@@ -93,15 +92,12 @@ public class Particle {
         return Objects.hash(this.getId());
     }
 
-    public BigDecimal distanceTo(Particle other) {
-        BigDecimal ctr_dist =
-                BigDecimal.valueOf(
-                        Math.sqrt(this.position.getX().subtract(other.position.getX()).pow(2)
-                                .add(this.position.getY().subtract(other.position.getY().pow(2)))
-                                .doubleValue()
-                        )
-                );
+    public double distanceTo(Particle other) {
+        double ctr_dist = Math.sqrt(
+                Math.pow(this.position.getX() - other.position.getX(), 2)
+                + Math.pow(this.position.getY() - other.position.getY(), 2)
+        );
 
-        return ctr_dist.subtract(this.getRadius()).subtract(other.getRadius());
+        return (ctr_dist - this.getRadius()) - other.getRadius();
     }
 }
