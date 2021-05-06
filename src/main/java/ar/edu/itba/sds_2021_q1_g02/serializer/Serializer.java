@@ -25,7 +25,7 @@ public abstract class Serializer {
             return true;
 
         this.lastSerialized = this.lastSerialized + step.getRelativeTime();
-        if (this.lastSerialized - this.serializeEvery >= 0) {
+        if (this.lastSerialized - this.serializeEvery >= 0 || step.isLastStep()) {
             this.restartCount();
             return true;
         }
