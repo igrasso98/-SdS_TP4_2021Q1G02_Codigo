@@ -35,29 +35,33 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
         return new Pair<>(newPosition, correctedVelocity);
     }
 
-    private Position calculatePositions(BigDecimal step, Particle currentParticleState,
-                                        Particle previousParticleState) {
+    @Override
+    public String getName() {
+        return "Beeman";
+    }
 
-        BigDecimal positionX = this.calculatePosition(step, currentParticleState.getPosition().getX(),
+    private Position calculatePositions(double step, Particle currentParticleState,
+                                        Particle previousParticleState) {
+        double positionX = this.calculatePosition(step, currentParticleState.getPosition().getX(),
                 currentParticleState.getVelocity().getxSpeed(), this.forceCalculator.calculateX(currentParticleState)
                 , this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
 
-        BigDecimal positionY = this.calculatePosition(step, currentParticleState.getPosition().getY(),
+        double positionY = this.calculatePosition(step, currentParticleState.getPosition().getY(),
                 currentParticleState.getVelocity().getySpeed(), this.forceCalculator.calculateY(currentParticleState)
                 , this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
 
         return new Position(positionX, positionY);
     }
 
-    private Velocity calculateCorrectedVelocities(BigDecimal step, Particle currentParticleState,
+    private Velocity calculateCorrectedVelocities(double step, Particle currentParticleState,
                                                   Particle previousParticleState, Particle nextParticleState) {
-        BigDecimal velocityX = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
+        double velocityX = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
                 this.forceCalculator.calculateX(currentParticleState),
                 this.forceCalculator.calculateX(previousParticleState),
                 this.forceCalculator.calculateX(nextParticleState),
                 currentParticleState.getMass());
 
-        BigDecimal velocityY = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getySpeed(),
+        double velocityY = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getySpeed(),
                 this.forceCalculator.calculateY(currentParticleState),
                 this.forceCalculator.calculateY(previousParticleState),
                 this.forceCalculator.calculateY(nextParticleState),
@@ -66,41 +70,39 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
         return new Velocity(velocityX, velocityY);
     }
 
-    private Velocity calculatePredictedVelocities(BigDecimal step, Particle currentParticleState,
+    private Velocity calculatePredictedVelocities(double step, Particle currentParticleState,
                                                   Particle previousParticleState) {
-        BigDecimal velocityX = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
+        double velocityX = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
                 this.forceCalculator.calculateX(currentParticleState),
                 this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
 
-        BigDecimal velocityY = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getySpeed(),
+        double velocityY = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getySpeed(),
                 this.forceCalculator.calculateY(currentParticleState),
                 this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
 
         return new Velocity(velocityX, velocityY);
     }
 
-    private BigDecimal calculatePosition(BigDecimal step, BigDecimal position, BigDecimal velocity, BigDecimal force,
-                                         BigDecimal previousForce, BigDecimal mass) {
+    private double calculatePosition(double step, double position, double velocity, double force,
+                                         double previousForce, double mass) {
         return position
-                .add(step.multiply(velocity))
-                .add((step.pow(2)).multiply(BigDecimal.valueOf(2 / 3)).multiply(BigDecimalDivision.divide(force, mass)))
-                .subtract(BigDecimal.valueOf(1 / 6).multiply(previousForce).multiply(step.pow(2)));
+                + step * velocity
+                + Math.pow(step, 2) * (2.0 / 3) * (force / mass)
+                - (1.0 / 6) * previousForce * Math.pow(step, 2);
     }
 
-    private BigDecimal calculatePredictedVelocity(BigDecimal step, BigDecimal velocity, BigDecimal force,
-                                                  BigDecimal previousForce, BigDecimal mass) {
+    private double calculatePredictedVelocity(double step, double velocity, double force,
+                                              double previousForce, double mass) {
         return velocity
-                .add(BigDecimal.valueOf(3 / 2).multiply(BigDecimalDivision.divide(force, mass)).multiply(step))
-                .subtract(BigDecimal.valueOf(1 / 2).multiply(BigDecimalDivision.divide(previousForce, mass)).multiply(step));
+                + (3.0 / 2) * (force / mass) * step
+                - (1.0 / 2) * (previousForce / mass) * step;
     }
 
-    private BigDecimal calculateCorrectedVelocity(BigDecimal step, BigDecimal velocity, BigDecimal force,
-                                                  BigDecimal previousForce, BigDecimal nextForce, BigDecimal mass) {
+    private double calculateCorrectedVelocity(double step, double velocity, double force,
+                                              double previousForce, double nextForce, double mass) {
         return velocity
-                .add(BigDecimal.valueOf(1 / 3).multiply(BigDecimalDivision.divide(nextForce, mass)).multiply(step))
-                .add(BigDecimal.valueOf(5 / 6).multiply(BigDecimalDivision.divide(force, mass)).multiply(step))
-                .subtract(BigDecimal.valueOf(1 / 6).multiply(previousForce).multiply(step));
-
-
+                + (1.0 / 3) * (nextForce / mass) * step
+                + (5.0 / 6) * (force / mass) * step
+                - (1.0 / 6) * previousForce * step;
     }
 }

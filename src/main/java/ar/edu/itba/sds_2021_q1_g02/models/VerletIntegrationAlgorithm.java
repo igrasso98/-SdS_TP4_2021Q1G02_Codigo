@@ -2,8 +2,6 @@ package ar.edu.itba.sds_2021_q1_g02.models;
 
 import javafx.util.Pair;
 
-import java.math.BigDecimal;
-
 public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     private final ForceCalculator forceCalculator;
 
@@ -19,12 +17,17 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
         return new Pair<>(nextPosition, nextVelocity);
     }
 
+    @Override
+    public String getName() {
+        return "Verlet";
+    }
+
     private Position calculatePositions(Step step, Particle particle) {
-        BigDecimal positionX = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getX(),
+        double positionX = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getX(),
                 step.getPreviousPosition(particle).getX(), this.forceCalculator.calculateX(particle),
                 particle.getMass());
 
-        BigDecimal positionY = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getY(),
+        double positionY = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getY(),
                 step.getPreviousPosition(particle).getY(), this.forceCalculator.calculateY(particle),
                 particle.getMass());
 
@@ -32,26 +35,23 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     }
 
     private Velocity calculateVelocities(Step step, Particle currentParticleState, Position nextPosition) {
-        BigDecimal velocityX = this.calculateVelocity(step.getRelativeTime(),
+        double velocityX = this.calculateVelocity(step.getRelativeTime(),
                 step.getPreviousPosition(currentParticleState).getX(), nextPosition.getX());
-        BigDecimal velocityY = this.calculateVelocity(step.getRelativeTime(),
+        double velocityY = this.calculateVelocity(step.getRelativeTime(),
                 step.getPreviousPosition(currentParticleState).getY(), nextPosition.getY());
 
         return new Velocity(velocityX, velocityY);
     }
 
 
-    private BigDecimal calculatePosition(BigDecimal step, BigDecimal position, BigDecimal previousPosition,
-                                         BigDecimal force, BigDecimal mass) {
-        return position
-                .multiply(BigDecimal.valueOf(2))
-                .subtract(previousPosition)
-                .add(BigDecimalDivision.divide(step.pow(2), mass).multiply(force));
+    private double calculatePosition(double step, double position, double previousPosition,
+                                         double force, double mass) {
+        return position * 2
+                - previousPosition
+                + (Math.pow(step, 2) / mass) * force;
     }
 
-    public BigDecimal calculateVelocity(BigDecimal step, BigDecimal previousPosition, BigDecimal nextPosition) {
-        return BigDecimalDivision.divide(
-                nextPosition.subtract(previousPosition),
-                step.multiply(BigDecimal.valueOf(2)));
+    public double calculateVelocity(double step, double previousPosition, double nextPosition) {
+        return (nextPosition - previousPosition) / (step * 2);
     }
 }
