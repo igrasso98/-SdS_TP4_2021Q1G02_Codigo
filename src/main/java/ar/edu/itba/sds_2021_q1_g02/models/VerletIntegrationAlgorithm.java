@@ -44,14 +44,15 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     }
 
 
-    private double calculatePosition(double step, double position, double previousPosition,
-                                         double force, double mass) {
+    private double calculatePosition(double dt, double position, double previousPosition,
+                                     double force, double mass)
+    {
         return position * 2
                 - previousPosition
-                + (Math.pow(step, 2) / mass) * force;
+                + (Math.pow(dt, 2) / mass) * force;
     }
 
-    public double calculateVelocity(double step, double previousPosition, double nextPosition) {
-        return (nextPosition - previousPosition) / (step * 2);
+    public double calculateVelocity(double dt, double previousPosition, double nextPosition) {
+        return (nextPosition - previousPosition) / (dt * 2);
     }
 }

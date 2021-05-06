@@ -29,13 +29,13 @@ public class EulerIntegrationAlgorithm implements IntegrationAlgorithm {
         return "Euler";
     }
 
-    private double calculatePosition(Particle particle, double velocity, double position, double step, double force) {
+    private double calculatePosition(Particle particle, double velocity, double position, double dt, double force) {
         return position
-                + step * velocity
-                + Math.pow(step, 2) / (particle.getMass() * 2) * force;
+                + dt * velocity
+                + Math.pow(dt, 2) / (particle.getMass() * 2) * force;
     }
 
-    private double calculateVelocity(Particle particle, double velocity, double step, double force) {
-        return velocity + (step / particle.getMass()) * force;
+    private double calculateVelocity(Particle particle, double velocity, double dt, double force) {
+        return velocity + (dt / particle.getMass()) * force;
     }
 }

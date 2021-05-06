@@ -2,8 +2,8 @@ package ar.edu.itba.sds_2021_q1_g02.models;
 
 import javafx.util.Pair;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAlgorithm {
     static private final int ZERO_DERIVATIVE = 0;
@@ -73,40 +73,43 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
     }
 
     private List<Pair<Double, Double>> correct(List<Pair<Double, Double>> predictions,
-                                                       double accelerationX, double accelerationY,
-                                                       double step) {
+                                               double accelerationX, double accelerationY,
+                                               double dt)
+    {
         if (this.forceCalculator.isVelocityDependant()) {
             alphas[0] = 3.0 / 16.0;
         }
         List<Pair<Double, Double>> corrections = new ArrayList<>();
         for (int i = 0; i < predictions.size(); i++) {
             corrections.add(new Pair<>(
-                    predictions.get(i).getKey() + (alphas[i] * accelerationX * (factorials[i] / Math.pow(step, i))),
-                    predictions.get(i).getValue() + (alphas[i] * accelerationY * (factorials[i] / Math.pow(step, i)))
+                    predictions.get(i).getKey() + (alphas[i] * accelerationX * (factorials[i] / Math.pow(dt, i))),
+                    predictions.get(i).getValue() + (alphas[i] * accelerationY * (factorials[i] / Math.pow(dt, i)))
             ));
         }
         return corrections;
     }
 
     private List<Pair<Double, Double>> predict(List<Pair<Double, Double>> derivatives,
-                                                       double step) {
+                                               double dt)
+    {
         List<Pair<Double, Double>> predictions = new ArrayList<>();
         for (int i = 0; i < derivatives.size(); i++) {
-            predictions.add(this.calculatePredictedDerivative(derivatives.subList(i, derivatives.size()), step));
+            predictions.add(this.calculatePredictedDerivative(derivatives.subList(i, derivatives.size()), dt));
         }
         return predictions;
     }
 
     private Pair<Double, Double> calculatePredictedDerivative(List<Pair<Double, Double>> derivatives,
-                                                                      double step) {
+                                                              double dt)
+    {
         double predictedDerivativeX = 0;
         double predictedDerivativeY = 0;
         int idx = 0;
         while (idx < derivatives.size()) {
             predictedDerivativeX =
-                    predictedDerivativeX + (derivatives.get(idx).getKey() * (Math.pow(step, idx) / factorials[idx]));
+                    predictedDerivativeX + (derivatives.get(idx).getKey() * (Math.pow(dt, idx) / factorials[idx]));
             predictedDerivativeY =
-                    predictedDerivativeY + (derivatives.get(idx).getValue() * (Math.pow(step, idx) / factorials[idx]));
+                    predictedDerivativeY + (derivatives.get(idx).getValue() * (Math.pow(dt, idx) / factorials[idx]));
             idx++;
         }
         return new Pair<>(predictedDerivativeX, predictedDerivativeY);
