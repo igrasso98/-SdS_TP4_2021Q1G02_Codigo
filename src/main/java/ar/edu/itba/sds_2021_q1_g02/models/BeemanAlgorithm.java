@@ -1,93 +1,106 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
+import javafx.geometry.Pos;
 import javafx.util.Pair;
 
 import java.math.BigDecimal;
 
 public class BeemanAlgorithm implements IntegrationAlgorithm {
-    private final IntegrationAlgorithm eulerIntegration;
     private final ForceCalculator forceCalculator;
-    private Acceleration lastAcceleration;
-    private Position lastPosition;
-    private Velocity lastVelocity;
+
     public BeemanAlgorithm(ForceCalculator forceCalculator) {
         this.forceCalculator = forceCalculator;
-        this.lastAcceleration = new Acceleration(null, null);
-        this.lastPosition = new Position(null, null);
-        this.lastVelocity = new Velocity(null, null);
-        this.eulerIntegration = new EulerIntegrationAlgorithm(forceCalculator);
     }
 
     @Override
     public Pair<Position, Velocity> perform(Particle particle, Step step) {
+        Particle previousParticleState = particle.copy();
+        previousParticleState.setPosition(step.getPreviousPosition(particle));
+        previousParticleState.setVelocity(step.getPreviousVelocity(particle));
 
-        return null;
-    }
+        Position newPosition = this.calculatePositions(step.getRelativeTime(), particle, previousParticleState);
 
+        Particle nextParticleState = particle.copy();
+        nextParticleState.setPosition(newPosition);
 
-
-
-    public Position calculatePosition(Particle particle, Step step) {
-        if(this.lastAcceleration.getxAcceleration() == null){
-            calculateLastAcceleration(particle, step);
+        if (this.forceCalculator.isVelocityDependant()) {
+            Velocity predictedVelocity = this.calculatePredictedVelocities(step.getRelativeTime(), particle,
+                    previousParticleState);
+            nextParticleState.setVelocity(predictedVelocity);
         }
-        return new Position(
-                this.calculatePosition(
-                        particle,
-                        particle.getVelocity().getxSpeed(),
-                        particle.getPosition().getX(),
-                        step.getRelativeTime(),
-                        this.forceCalculator.calculateX(particle),
-                        this.lastAcceleration.getxAcceleration()),
-                this.calculatePosition(
-                        particle,
-                        particle.getVelocity().getySpeed(),
-                        particle.getPosition().getY(),
-                        step.getRelativeTime(),
-                        this.forceCalculator.calculateY(particle),
-                        this.lastAcceleration.getyAcceleration()));
+
+        Velocity correctedVelocity = this.calculateCorrectedVelocities(step.getRelativeTime(), particle,
+                previousParticleState, nextParticleState);
+
+        return new Pair<>(newPosition, correctedVelocity);
     }
 
-    @Override
-    public Velocity calculateVelocity(Particle particle, Step step) {
-        return new Velocity(
-                this.calculateVelocity(
-                        particle,
-                        particle.getVelocity().getxSpeed(),
-                        step.getRelativeTime(),
-                        this.forceCalculator.calculateX(particle),
-                        this.lastAcceleration.getxAcceleration()),
-                this.calculateVelocity(
-                        particle,
-                        particle.getVelocity().getySpeed(),
-                        step.getRelativeTime(),
-                        this.forceCalculator.calculateY(particle),
-                        this.lastAcceleration.getyAcceleration())
-        );
+    private Position calculatePositions(BigDecimal step, Particle currentParticleState,
+                                        Particle previousParticleState) {
+
+        BigDecimal positionX = this.calculatePosition(step, currentParticleState.getPosition().getX(),
+                currentParticleState.getVelocity().getxSpeed(), this.forceCalculator.calculateX(currentParticleState)
+                , this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
+
+        BigDecimal positionY = this.calculatePosition(step, currentParticleState.getPosition().getY(),
+                currentParticleState.getVelocity().getySpeed(), this.forceCalculator.calculateY(currentParticleState)
+                , this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
+
+        return new Position(positionX, positionY);
     }
 
-    private BigDecimal calculatePosition(Particle particle, BigDecimal velocity, BigDecimal position, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
+    private Velocity calculateCorrectedVelocities(BigDecimal step, Particle currentParticleState,
+                                                  Particle previousParticleState, Particle nextParticleState) {
+        BigDecimal velocityX = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
+                this.forceCalculator.calculateX(currentParticleState),
+                this.forceCalculator.calculateX(previousParticleState),
+                this.forceCalculator.calculateX(nextParticleState),
+                currentParticleState.getMass());
+
+        BigDecimal velocityY = this.calculateCorrectedVelocity(step, currentParticleState.getVelocity().getySpeed(),
+                this.forceCalculator.calculateY(currentParticleState),
+                this.forceCalculator.calculateY(previousParticleState),
+                this.forceCalculator.calculateY(nextParticleState),
+                currentParticleState.getMass());
+
+        return new Velocity(velocityX, velocityY);
+    }
+
+    private Velocity calculatePredictedVelocities(BigDecimal step, Particle currentParticleState,
+                                                  Particle previousParticleState) {
+        BigDecimal velocityX = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getxSpeed(),
+                this.forceCalculator.calculateX(currentParticleState),
+                this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
+
+        BigDecimal velocityY = this.calculatePredictedVelocity(step, currentParticleState.getVelocity().getySpeed(),
+                this.forceCalculator.calculateY(currentParticleState),
+                this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
+
+        return new Velocity(velocityX, velocityY);
+    }
+
+    private BigDecimal calculatePosition(BigDecimal step, BigDecimal position, BigDecimal velocity, BigDecimal force,
+                                         BigDecimal previousForce, BigDecimal mass) {
         return position
                 .add(step.multiply(velocity))
-                .add((step.pow(2)).multiply(BigDecimal.valueOf(2/3)).multiply(BigDecimalDivision.divide(force, particle.getMass())))
-                .subtract(BigDecimal.valueOf(1/6).multiply(lastAcceleration).multiply(step.pow(2)));
+                .add((step.pow(2)).multiply(BigDecimal.valueOf(2 / 3)).multiply(BigDecimalDivision.divide(force, mass)))
+                .subtract(BigDecimal.valueOf(1 / 6).multiply(previousForce).multiply(step.pow(2)));
     }
 
-//    private BigDecimal calculateVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
-//        BigDecimal predictedVel = calculatePredictedVelocity(particle, velocity, step, force, lastAcceleration);
-////        Medio perdida aca
-//        return velocity
-//                .add(BigDecimal.valueOf(1/3));
-//    }
-
-
-    private BigDecimal calculateCorrectedVelocity() {
-
-    }
-
-    private BigDecimal calculatePredictedVelocity(Particle particle, BigDecimal velocity, BigDecimal step, BigDecimal force, BigDecimal lastAcceleration) {
+    private BigDecimal calculatePredictedVelocity(BigDecimal step, BigDecimal velocity, BigDecimal force,
+                                                  BigDecimal previousForce, BigDecimal mass) {
         return velocity
-                .add(BigDecimal.valueOf(2/3).multiply(BigDecimalDivision.divide(force, particle.getMass())).multiply(step)).
-                subtract(BigDecimal.valueOf(1/2).multiply(lastAcceleration).multiply(step));
+                .add(BigDecimal.valueOf(3 / 2).multiply(BigDecimalDivision.divide(force, mass)).multiply(step))
+                .subtract(BigDecimal.valueOf(1 / 2).multiply(BigDecimalDivision.divide(previousForce, mass)).multiply(step));
+    }
+
+    private BigDecimal calculateCorrectedVelocity(BigDecimal step, BigDecimal velocity, BigDecimal force,
+                                                  BigDecimal previousForce, BigDecimal nextForce, BigDecimal mass) {
+        return velocity
+                .add(BigDecimal.valueOf(1 / 3).multiply(BigDecimalDivision.divide(nextForce, mass)).multiply(step))
+                .add(BigDecimal.valueOf(5 / 6).multiply(BigDecimalDivision.divide(force, mass)).multiply(step))
+                .subtract(BigDecimal.valueOf(1 / 6).multiply(previousForce).multiply(step));
+
+
     }
 }
