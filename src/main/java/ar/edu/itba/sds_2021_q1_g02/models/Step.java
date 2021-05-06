@@ -10,6 +10,7 @@ public class Step {
     private final double absoluteTime;
     private final int step;
     private final IntegrationAlgorithm integrationAlgorithm;
+    private boolean isLastStep = false;
 
     public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle, Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step, IntegrationAlgorithm integrationAlgorithm) {
         this.particleMap = particleMap;
@@ -44,5 +45,13 @@ public class Step {
 
     public Velocity getPreviousVelocity(Particle particle) {
         return this.previousParticlesVelocity.get(particle);
+    }
+
+    public boolean isLastStep() {
+        return this.isLastStep;
+    }
+
+    public void setLastStep(boolean lastStep) {
+        this.isLastStep = lastStep;
     }
 }

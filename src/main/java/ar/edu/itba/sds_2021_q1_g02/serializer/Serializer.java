@@ -11,11 +11,9 @@ public abstract class Serializer {
 
     private final double serializeEvery;
     private double lastSerialized = 0;
-    private double maxTime;
 
-    public Serializer(double serializeEvery, double maxTime) {
+    public Serializer(double serializeEvery) {
         this.serializeEvery = serializeEvery;
-        this.maxTime = maxTime;
     }
 
     public void serializeSystem(Collection<Particle> particles, IntegrationAlgorithm integrationAlgorithm) {}
@@ -27,7 +25,7 @@ public abstract class Serializer {
             return true;
 
         this.lastSerialized = this.lastSerialized + step.getRelativeTime();
-        if (this.lastSerialized - this.serializeEvery >= 0 || (this.maxTime < Serializer.INFINITE_TIME && step.getAbsoluteTime() + step.getRelativeTime() >= this.maxTime)) {
+        if (this.lastSerialized - this.serializeEvery >= 0) {
             this.restartCount();
             return true;
         }

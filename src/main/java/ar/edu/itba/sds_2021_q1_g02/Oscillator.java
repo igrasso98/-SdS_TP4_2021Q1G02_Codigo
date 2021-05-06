@@ -28,6 +28,9 @@ public class Oscillator extends Serializable {
 
         while (step.getAbsoluteTime() < this.maxTime) {
             step = this.simulateStep(step);
+            if (step.getAbsoluteTime() >= this.maxTime)
+                step.setLastStep(true);
+
             this.serialize(Collections.singletonList(this.particle), step);
         }
     }

@@ -15,14 +15,10 @@ public class OscillatorSerializer extends Serializer {
     private final TreeMap<Double, Map<IntegrationAlgorithm, Position>> results = new TreeMap<>();
     private final List<IntegrationAlgorithm> integrationAlgorithms = new LinkedList<>();
 
-    public OscillatorSerializer(FileFormatter fileFormatter, double serializeEvery, double maxTime) {
-        super(serializeEvery, maxTime);
+    public OscillatorSerializer(FileFormatter fileFormatter, double serializeEvery) {
+        super(serializeEvery);
 
         this.fileFormatter = fileFormatter;
-    }
-
-    public OscillatorSerializer(FileFormatter fileFormatter, double serializeEvery) {
-        this(fileFormatter, serializeEvery, Serializer.INFINITE_TIME);
     }
 
     public void finish() {

@@ -10,8 +10,7 @@ import java.io.IOException;
 public class App {
     private static OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
             step -> "R:/output/oscillator.tsv",
-            0.01,
-            5
+            0.01
     );
 
     public static void main(String[] args) throws ParseException, IOException {
