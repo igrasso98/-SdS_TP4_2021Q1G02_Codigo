@@ -39,7 +39,8 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         double accelerationX =
                 (derivatives.get(2).getKey() - predictions.get(2).getKey()) * (Math.pow(step.getRelativeTime(), 2) / 2);
         double accelerationY =
-                (derivatives.get(2).getValue() - predictions.get(2).getValue()) * (Math.pow(step.getRelativeTime(), 2) / 2);
+                (derivatives.get(2).getValue() - predictions.get(2).getValue()) * (Math.pow(step.getRelativeTime(),
+                        2) / 2);
 
         return this.correct(predictions, accelerationX, accelerationY, step.getRelativeTime());
     }
@@ -50,32 +51,31 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         derivatives.add(new Pair<>(particle.getVelocity().getxSpeed(), particle.getVelocity().getySpeed()));
         derivatives.add(new Pair<>(
                 this.forceCalculator.calculate(derivatives.get(ZERO_DERIVATIVE).getKey(),
-                        derivatives.get(FIRST_DERIVATIVE).getKey()),
+                        derivatives.get(FIRST_DERIVATIVE).getKey()) / particle.getMass(),
                 this.forceCalculator.calculate(derivatives.get(ZERO_DERIVATIVE).getValue(),
-                        derivatives.get(FIRST_DERIVATIVE).getValue())));
+                        derivatives.get(FIRST_DERIVATIVE).getValue()) / particle.getMass()));
         derivatives.add(new Pair<>(
                 this.forceCalculator.calculate(derivatives.get(FIRST_DERIVATIVE).getKey(),
-                        derivatives.get(SECOND_DERIVATIVE).getKey()),
+                        derivatives.get(SECOND_DERIVATIVE).getKey()) / particle.getMass(),
                 this.forceCalculator.calculate(derivatives.get(FIRST_DERIVATIVE).getValue(),
-                        derivatives.get(SECOND_DERIVATIVE).getValue())));
+                        derivatives.get(SECOND_DERIVATIVE).getValue()) / particle.getMass()));
         derivatives.add(new Pair<>(
                 this.forceCalculator.calculate(derivatives.get(SECOND_DERIVATIVE).getKey(),
-                        derivatives.get(THIRD_DERIVATIVE).getKey()),
+                        derivatives.get(THIRD_DERIVATIVE).getKey()) / particle.getMass(),
                 this.forceCalculator.calculate(derivatives.get(SECOND_DERIVATIVE).getValue(),
-                        derivatives.get(THIRD_DERIVATIVE).getValue())));
+                        derivatives.get(THIRD_DERIVATIVE).getValue()) / particle.getMass()));
         derivatives.add(new Pair<>(
                 this.forceCalculator.calculate(derivatives.get(THIRD_DERIVATIVE).getKey(),
-                        derivatives.get(FOURTH_DERIVATIVE).getKey()),
+                        derivatives.get(FOURTH_DERIVATIVE).getKey()) / particle.getMass(),
                 this.forceCalculator.calculate(derivatives.get(THIRD_DERIVATIVE).getValue(),
-                        derivatives.get(FOURTH_DERIVATIVE).getValue())));
+                        derivatives.get(FOURTH_DERIVATIVE).getValue()) / particle.getMass()));
 
         return derivatives;
     }
 
     private List<Pair<Double, Double>> correct(List<Pair<Double, Double>> predictions,
                                                double accelerationX, double accelerationY,
-                                               double dt)
-    {
+                                               double dt) {
         if (this.forceCalculator.isVelocityDependant()) {
             alphas[0] = 3.0 / 16.0;
         }
@@ -90,8 +90,7 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
     }
 
     private List<Pair<Double, Double>> predict(List<Pair<Double, Double>> derivatives,
-                                               double dt)
-    {
+                                               double dt) {
         List<Pair<Double, Double>> predictions = new ArrayList<>();
         for (int i = 0; i < derivatives.size(); i++) {
             predictions.add(this.calculatePredictedDerivative(derivatives.subList(i, derivatives.size()), dt));
@@ -100,8 +99,7 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
     }
 
     private Pair<Double, Double> calculatePredictedDerivative(List<Pair<Double, Double>> derivatives,
-                                                              double dt)
-    {
+                                                              double dt) {
         double predictedDerivativeX = 0;
         double predictedDerivativeY = 0;
         int idx = 0;

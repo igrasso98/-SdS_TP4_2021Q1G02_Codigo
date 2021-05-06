@@ -11,7 +11,7 @@ public class App {
             step -> "R:/output/oscillator.tsv",
             0.01
     );
-    private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10e4, 100);
+    private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10000, 100);
 
     public static void main(String[] args) throws ParseException, IOException {
 //        CommandParser.getInstance().parse(args);
