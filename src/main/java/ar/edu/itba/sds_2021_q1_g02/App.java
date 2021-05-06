@@ -2,16 +2,16 @@ package ar.edu.itba.sds_2021_q1_g02;
 
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 
 public class App {
-    private static OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
+    private static final OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
             step -> "R:/output/oscillator.tsv",
             0.01
     );
+    private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10e4, 100);
 
     public static void main(String[] args) throws ParseException, IOException {
 //        CommandParser.getInstance().parse(args);
@@ -79,13 +79,17 @@ public class App {
     }
 
     private static void oscillatorSimulation() {
-        Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
-        Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
-        Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
+        Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE));
+        Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE));
+        Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE));
+        Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE));
+        Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE));
         Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution());
 
         App.putOscillatorSerializers(eulerOscillator);
         App.putOscillatorSerializers(eulerVelocityOscillator);
+        App.putOscillatorSerializers(beemanOscillator);
+        App.putOscillatorSerializers(verletOscillator);
         App.putOscillatorSerializers(gearPredictorOscillator);
         App.putOscillatorSerializers(realOscillator);
 
@@ -93,6 +97,10 @@ public class App {
         eulerOscillator.simulate();
         System.out.println("Simulating euler velocity");
         eulerVelocityOscillator.simulate();
+        System.out.println("Simulating beeman");
+        beemanOscillator.simulate();
+        System.out.println("Simulating verlet");
+        verletOscillator.simulate();
         System.out.println("Simulating gear predictor");
         gearPredictorOscillator.simulate();
         System.out.println("Simulating real");
@@ -157,7 +165,7 @@ public class App {
                         0
                 ),
                 new Velocity(
-                        -50,
+                        -0.7142857142857,
                         0
                 )
         );
