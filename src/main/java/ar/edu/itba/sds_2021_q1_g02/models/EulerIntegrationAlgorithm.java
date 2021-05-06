@@ -32,7 +32,7 @@ public class EulerIntegrationAlgorithm implements IntegrationAlgorithm {
     private double calculatePosition(Particle particle, double velocity, double position, double dt, double force) {
         return position
                 + dt * velocity
-                + Math.pow(dt, 2) / (particle.getMass() * 2) * force;
+                + (Math.pow(dt, 2) / (particle.getMass() * 2)) * force;
     }
 
     private double calculateVelocity(Particle particle, double velocity, double dt, double force) {
