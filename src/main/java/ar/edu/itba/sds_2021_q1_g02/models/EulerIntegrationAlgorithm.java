@@ -24,6 +24,11 @@ public class EulerIntegrationAlgorithm implements IntegrationAlgorithm {
         return new Pair<>(newPosition, newVelocity);
     }
 
+    @Override
+    public String getName() {
+        return "Euler";
+    }
+
     private double calculatePosition(Particle particle, double velocity, double position, double step, double force) {
         return position
                 + step * velocity

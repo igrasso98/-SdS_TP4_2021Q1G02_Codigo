@@ -30,4 +30,8 @@ public abstract class Serializer {
 
         return false;
     }
+
+    protected void restartCount() {
+        this.lastSerialized = 0;
+    }
 }

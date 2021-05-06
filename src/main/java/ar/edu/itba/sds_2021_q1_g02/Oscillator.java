@@ -1,38 +1,34 @@
 package ar.edu.itba.sds_2021_q1_g02;
 
 import ar.edu.itba.sds_2021_q1_g02.models.*;
-import ar.edu.itba.sds_2021_q1_g02.serializer.Serializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.Serializable;
 import javafx.util.Pair;
 
 import java.util.*;
 
-public class Oscillator {
+public class Oscillator extends Serializable {
     private final static double EPSILON = 1e-10;
 
     private final Particle particle;
-    private final List<Serializer> serializers;
     private final IntegrationAlgorithm integrationAlgorithm;
     private final double dt;
+    private final double maxTime;
 
-    public Oscillator(Particle particle, IntegrationAlgorithm integrationAlgorithm, double dt) {
+    public Oscillator(Particle particle, IntegrationAlgorithm integrationAlgorithm, double dt, double maxTime) {
         this.particle = particle;
-        this.serializers = new LinkedList<>();
         this.integrationAlgorithm = integrationAlgorithm;
         this.dt = dt;
-    }
-
-    public void addSerializer(Serializer serializer) {
-        this.serializers.add(serializer);
+        this.maxTime = maxTime;
     }
 
     public void simulate() {
-        this.serializeSystem();
+        this.serializeSystem(Collections.singletonList(this.particle), this.integrationAlgorithm);
         Step step = this.calculateFirstStep();
-        this.serialize(step);
+        this.serialize(Collections.singletonList(this.particle), step);
 
-        while (!this.particle.getVelocity().isZero(EPSILON) || !step.getPreviousVelocity(this.particle).isZero(EPSILON)) {
+        while (step.getAbsoluteTime() < this.maxTime) {
             step = this.simulateStep(step);
-            this.serialize(step);
+            this.serialize(Collections.singletonList(this.particle), step);
         }
     }
 
@@ -48,7 +44,8 @@ public class Oscillator {
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
                 previousStep.getAbsoluteTime() + this.dt,
-                previousStep.getStep() + 1
+                previousStep.getStep() + 1,
+                this.integrationAlgorithm
         );
     }
 
@@ -59,19 +56,8 @@ public class Oscillator {
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
                 this.dt,
-                0
+                0,
+                this.integrationAlgorithm
         );
-    }
-
-    private void serializeSystem() {
-        for (Serializer serializer : this.serializers) {
-            serializer.serializeSystem(Collections.singletonList(this.particle), this.integrationAlgorithm);
-        }
-    }
-
-    private void serialize(Step step) {
-        for (Serializer serializer : this.serializers) {
-            serializer.serialize(Collections.singletonList(this.particle), step);
-        }
     }
 }

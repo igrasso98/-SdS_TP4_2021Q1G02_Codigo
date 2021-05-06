@@ -9,8 +9,9 @@ public class Step {
     private final double deltaTime;
     private final double absoluteTime;
     private final int step;
+    private final IntegrationAlgorithm integrationAlgorithm;
 
-    public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle, Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step) {
+    public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle, Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step, IntegrationAlgorithm integrationAlgorithm) {
         this.particleMap = particleMap;
         this.previousParticlesPosition = previousParticlesPosition;
         this.previousParticlesVelocity = previousParticlesVelocity;
@@ -18,6 +19,7 @@ public class Step {
         this.deltaTime = deltaTime;
         this.absoluteTime = absoluteTime;
         this.step = step;
+        this.integrationAlgorithm = integrationAlgorithm;
     }
 
     public double getRelativeTime() {
@@ -30,6 +32,10 @@ public class Step {
 
     public int getStep() {
         return this.step;
+    }
+
+    public IntegrationAlgorithm getIntegrationAlgorithm() {
+        return this.integrationAlgorithm;
     }
 
     public Position getPreviousPosition(Particle particle) {

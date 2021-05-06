@@ -4,4 +4,6 @@ import javafx.util.Pair;
 
 public interface IntegrationAlgorithm {
     Pair<Position, Velocity> perform(Particle particle, Step step);
+
+    String getName();
 }

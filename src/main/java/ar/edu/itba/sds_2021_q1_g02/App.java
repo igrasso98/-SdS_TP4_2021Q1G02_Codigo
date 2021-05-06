@@ -1,21 +1,24 @@
 package ar.edu.itba.sds_2021_q1_g02;
 
 import ar.edu.itba.sds_2021_q1_g02.models.*;
-import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
-import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
-import ar.edu.itba.sds_2021_q1_g02.serializer.ConsoleSerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
-import javafx.util.Pair;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
-import java.util.List;
 
 public class App {
+    private static OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
+            step -> "R:/output/oscillator.tsv",
+            0.01
+    );
+
     public static void main(String[] args) throws ParseException, IOException {
 //        CommandParser.getInstance().parse(args);
 
+        System.out.println("------------- OSCILLATOR -------------");
         App.oscillatorSimulation();
+        System.out.println("--------------------------------------");
 
 //        GD.addSerializer(new OvitoSerializer(
 //                (systemParticles, step) -> (systemParticles.size() + 2) + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
@@ -76,29 +79,27 @@ public class App {
     }
 
     private static void oscillatorSimulation() {
-        Oscillator oscillator = new Oscillator(
-                new Particle(
-                        1,
-                        1,
-                        70,
-                        new Position(
-                                1,
-                                0
-                        ),
-                        new Velocity(
-                                -50,
-                                0
-                        )
-                ),
-                new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)),
-                0.001
-        );
+        Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
+        Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
+        Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(10e4, 100)));
+        Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution());
 
-        App.putOscillatorSerializers(oscillator);
+        App.putOscillatorSerializers(eulerOscillator);
+        App.putOscillatorSerializers(eulerVelocityOscillator);
+        App.putOscillatorSerializers(gearPredictorOscillator);
+        App.putOscillatorSerializers(realOscillator);
 
-        System.out.println("Running oscillator");
-        oscillator.simulate();
-        System.out.println("Ended oscillator");
+        System.out.println("Simulating euler");
+        eulerOscillator.simulate();
+        System.out.println("Simulating euler velocity");
+        eulerVelocityOscillator.simulate();
+        System.out.println("Simulating gear predictor");
+        gearPredictorOscillator.simulate();
+        System.out.println("Simulating real");
+        realOscillator.simulate();
+
+        System.out.println("Dumping results");
+        App.dumpOscillatorResults();
     }
 
     private static Color getParticleColor(Particle particle) {
@@ -110,23 +111,6 @@ public class App {
     }
 
     private static void putOscillatorSerializers(Oscillator oscillator) {
-        oscillator.addSerializer(new ConsoleSerializer(
-                (systemParticles, integrationAlgorithm) -> {
-                    return "Using integration algorithm: " + integrationAlgorithm.getClass().getName();
-                },
-                (stepParticles, step) -> {
-                    return "** Step = " + step.getStep() +
-                            "; dT = " + String.format("%.8fs", step.getRelativeTime());
-                },
-                (particle, step) -> {
-                    return particle.getId() + " | " +
-                            String.format("%.5fm", particle.getPosition().getX()) +
-                            " | " +
-                            String.format("%.5fm/s", particle.getVelocity().getxSpeed());
-                },
-                1
-        ));
-
         oscillator.addSerializer(new OvitoSerializer(
                 (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
                         ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
@@ -153,17 +137,38 @@ public class App {
                     return s;
                 },
                 step -> "R:/output/output_" + step + ".xyz",
-                0.1
+                0.01
         ));
+
+        oscillator.addSerializer(App.OSCILLATOR_SERIALIZER);
     }
 
-//    private void testGearPredictorCorrector() {
-//        GearPredictorCorrectorIntegrationAlgorithm integrationAlgorithm =
-//                new GearPredictorCorrectorIntegrationAlgorithm(new DampedOscillatorForceCalculator(Math.pow(10, 4),
-//                        100));
-//        integrationAlgorithm.calculatePosition(new Particle(1, 1, 1,
-//                        new Position(1, 0),
-//                        new Velocity(-(1.0 * 100.0 / (2.0 * 1.0)), 0)),
-//                0.01);
-//    }
+    private static void dumpOscillatorResults() {
+        App.OSCILLATOR_SERIALIZER.finish();
+    }
+
+    private static Particle getOscillatorParticle() {
+        return new Particle(
+                1,
+                1,
+                70,
+                new Position(
+                        1,
+                        0
+                ),
+                new Velocity(
+                        -50,
+                        0
+                )
+        );
+    }
+
+    private static Oscillator getOscillatorSystem(IntegrationAlgorithm integrationAlgorithm) {
+        return new Oscillator(
+                App.getOscillatorParticle(),
+                integrationAlgorithm,
+                0.001,
+                5
+        );
+    }
 }

@@ -27,6 +27,11 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         return new Pair<>(newPosition, newVelocity);
     }
 
+    @Override
+    public String getName() {
+        return "Gear Prediction Corrector orden 5";
+    }
+
     private List<Pair<Double, Double>> predictAndCorrect(Particle particle, Step step) {
         List<Pair<Double, Double>> derivatives = this.calculateDerivatives(particle);
         List<Pair<Double, Double>> predictions = this.predict(derivatives, step.getRelativeTime());
