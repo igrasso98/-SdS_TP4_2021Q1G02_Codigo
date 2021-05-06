@@ -11,12 +11,16 @@ public class OvitoSerializer extends Serializer {
     private final ParticleFormatter particleFormatter;
     private final FileFormatter fileFormatter;
 
-    public OvitoSerializer(StepFormatter stepFormatter, ParticleFormatter particleFormatter, FileFormatter fileFormatter, double serializeEvery) {
-        super(serializeEvery);
+    public OvitoSerializer(StepFormatter stepFormatter, ParticleFormatter particleFormatter, FileFormatter fileFormatter, double serializeEvery, double maxTime) {
+        super(serializeEvery, maxTime);
 
         this.stepFormatter = stepFormatter;
         this.particleFormatter = particleFormatter;
         this.fileFormatter = fileFormatter;
+    }
+
+    public OvitoSerializer(StepFormatter stepFormatter, ParticleFormatter particleFormatter, FileFormatter fileFormatter, double serializeEvery) {
+        this(stepFormatter, particleFormatter, fileFormatter, serializeEvery, Serializer.INFINITE_TIME);
     }
 
     @Override

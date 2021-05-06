@@ -7,11 +7,15 @@ import ar.edu.itba.sds_2021_q1_g02.models.Step;
 import java.util.Collection;
 
 public abstract class Serializer {
+    public static final double INFINITE_TIME = Double.POSITIVE_INFINITY;
+
     private final double serializeEvery;
     private double lastSerialized = 0;
+    private double maxTime;
 
-    public Serializer(double serializeEvery) {
+    public Serializer(double serializeEvery, double maxTime) {
         this.serializeEvery = serializeEvery;
+        this.maxTime = maxTime;
     }
 
     public void serializeSystem(Collection<Particle> particles, IntegrationAlgorithm integrationAlgorithm) {}
@@ -23,8 +27,8 @@ public abstract class Serializer {
             return true;
 
         this.lastSerialized = this.lastSerialized + step.getRelativeTime();
-        if (this.lastSerialized - this.serializeEvery >= 0) {
-            this.lastSerialized = 0;
+        if (this.lastSerialized - this.serializeEvery >= 0 || (this.maxTime < Serializer.INFINITE_TIME && step.getAbsoluteTime() + step.getRelativeTime() >= this.maxTime)) {
+            this.restartCount();
             return true;
         }
 

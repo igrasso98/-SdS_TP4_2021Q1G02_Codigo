@@ -10,7 +10,8 @@ import java.io.IOException;
 public class App {
     private static OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
             step -> "R:/output/oscillator.tsv",
-            0.01
+            0.01,
+            5
     );
 
     public static void main(String[] args) throws ParseException, IOException {
@@ -111,34 +112,34 @@ public class App {
     }
 
     private static void putOscillatorSerializers(Oscillator oscillator) {
-        oscillator.addSerializer(new OvitoSerializer(
-                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
-                        ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
-                (particle, step) -> {
-                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
-                    String s = particle.getId() + "\t" +
-                            particle.getRadius() + "\t" +
-                            particle.getPosition().getX() + "\t" +
-                            particle.getPosition().getY() + "\t" +
-                            particle.getVelocity().getxSpeed() + "\t" +
-                            particle.getVelocity().getySpeed() + "\t" +
-                            particle.getMass() + "\t";
-
-                    if (particle.getId() >= 0) {
-                        Color color = getParticleColor(particle);
-                        s += color.getRed() + "\t" +
-                                color.getGreen() + "\t" +
-                                color.getBlue() + "\t" +
-                                "0.0";
-                    } else {
-                        s += "0.0\t0.0\t0.0\t1.0";
-                    }
-
-                    return s;
-                },
-                step -> "R:/output/output_" + step + ".xyz",
-                0.01
-        ));
+//        oscillator.addSerializer(new OvitoSerializer(
+//                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
+//                        ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
+//                (particle, step) -> {
+//                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
+//                    String s = particle.getId() + "\t" +
+//                            particle.getRadius() + "\t" +
+//                            particle.getPosition().getX() + "\t" +
+//                            particle.getPosition().getY() + "\t" +
+//                            particle.getVelocity().getxSpeed() + "\t" +
+//                            particle.getVelocity().getySpeed() + "\t" +
+//                            particle.getMass() + "\t";
+//
+//                    if (particle.getId() >= 0) {
+//                        Color color = getParticleColor(particle);
+//                        s += color.getRed() + "\t" +
+//                                color.getGreen() + "\t" +
+//                                color.getBlue() + "\t" +
+//                                "0.0";
+//                    } else {
+//                        s += "0.0\t0.0\t0.0\t1.0";
+//                    }
+//
+//                    return s;
+//                },
+//                step -> "R:/output/output_" + step + ".xyz",
+//                0.01
+//        ));
 
         oscillator.addSerializer(App.OSCILLATOR_SERIALIZER);
     }

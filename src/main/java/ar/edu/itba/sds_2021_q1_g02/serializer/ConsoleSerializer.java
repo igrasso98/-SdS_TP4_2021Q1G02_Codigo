@@ -14,7 +14,7 @@ public class ConsoleSerializer extends Serializer {
     private final ParticleFormatter particleFormatter;
 
     public ConsoleSerializer(SystemFormatter systemFormatter, StepFormatter stepFormatter, ParticleFormatter particleFormatter, double serializeEvery) {
-        super(serializeEvery);
+        super(serializeEvery, Serializer.INFINITE_TIME);
 
         this.systemFormatter = systemFormatter;
         this.stepFormatter = stepFormatter;
