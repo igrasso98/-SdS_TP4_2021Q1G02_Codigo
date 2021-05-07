@@ -6,13 +6,15 @@ public class Step {
     private final Map<Integer, Particle> particleMap;
     private final Map<Particle, Position> previousParticlesPosition;
     private final Map<Particle, Velocity> previousParticlesVelocity;
-    private final double deltaTime;
-    private final double absoluteTime;
+    private double deltaTime;
+    private double absoluteTime;
     private final int step;
     private final IntegrationAlgorithm integrationAlgorithm;
     private boolean isLastStep = false;
 
-    public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle, Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step, IntegrationAlgorithm integrationAlgorithm) {
+    public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle,
+            Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step,
+                IntegrationAlgorithm integrationAlgorithm) {
         this.particleMap = particleMap;
         this.previousParticlesPosition = previousParticlesPosition;
         this.previousParticlesVelocity = previousParticlesVelocity;
@@ -43,9 +45,38 @@ public class Step {
         return this.previousParticlesPosition.get(particle);
     }
 
+    public boolean containsPreviousPosition(Particle particle) {
+        return this.previousParticlesPosition.containsKey(particle);
+    }
+
     public Velocity getPreviousVelocity(Particle particle) {
         return this.previousParticlesVelocity.get(particle);
     }
+
+    public boolean containsPreviousVelocity(Particle particle) {
+        return this.previousParticlesVelocity.containsKey(particle);
+    }
+
+    public Step copy() {
+        return new Step(
+                this.particleMap,
+                this.previousParticlesPosition,
+                this.previousParticlesVelocity,
+                this.deltaTime,
+                this.absoluteTime,
+                this.step,
+                this.integrationAlgorithm
+        );
+    }
+
+    public void setAbsoluteTime(double absoluteTime) {
+        this.absoluteTime = absoluteTime;
+    }
+
+    public void setRelativeTime(double relativeTime) {
+        this.deltaTime = relativeTime;
+    }
+
 
     public boolean isLastStep() {
         return this.isLastStep;

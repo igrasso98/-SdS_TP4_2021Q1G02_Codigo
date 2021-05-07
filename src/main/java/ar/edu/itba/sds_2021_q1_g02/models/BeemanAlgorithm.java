@@ -4,16 +4,29 @@ import javafx.util.Pair;
 
 public class BeemanAlgorithm implements IntegrationAlgorithm {
     private final ForceCalculator forceCalculator;
+    private final IntegrationAlgorithm euler;
 
     public BeemanAlgorithm(ForceCalculator forceCalculator) {
         this.forceCalculator = forceCalculator;
+        this.euler = new EulerIntegrationAlgorithm(forceCalculator);
     }
 
     @Override
     public Pair<Position, Velocity> perform(Particle particle, Step step) {
         Particle previousParticleState = particle.copy();
-        previousParticleState.setPosition(step.getPreviousPosition(particle));
-        previousParticleState.setVelocity(step.getPreviousVelocity(particle));
+
+        if (!step.containsPreviousPosition(particle)) {
+            Step previousStep = step.copy();
+            previousStep.setAbsoluteTime(previousStep.getAbsoluteTime() - previousStep.getRelativeTime());
+            previousStep.setRelativeTime(-1 * previousStep.getRelativeTime());
+            Pair<Position, Velocity> previousParticlePositionAndVelocity = this.euler.perform(previousParticleState,
+                    previousStep);
+            previousParticleState.setPosition(previousParticlePositionAndVelocity.getKey());
+            previousParticleState.setVelocity(previousParticlePositionAndVelocity.getValue());
+        } else {
+            previousParticleState.setPosition(step.getPreviousPosition(particle));
+            previousParticleState.setVelocity(step.getPreviousVelocity(particle));
+        }
 
         Position newPosition = this.calculatePositions(step.getRelativeTime(), particle, previousParticleState);
 
@@ -85,7 +98,7 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
         return position
                 + dt * velocity
                 + Math.pow(dt, 2) * (2.0 / 3) * (force / mass)
-                - (1.0 / 6) * previousForce * Math.pow(dt, 2);
+                - (1.0 / 6) * (previousForce / mass) * Math.pow(dt, 2);
     }
 
     private double calculatePredictedVelocity(double st, double velocity, double force,
@@ -100,6 +113,6 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
         return velocity
                 + (1.0 / 3) * (nextForce / mass) * dt
                 + (5.0 / 6) * (force / mass) * dt
-                - (1.0 / 6) * previousForce * dt;
+                - (1.0 / 6) * (previousForce / mass) * dt;
     }
 }

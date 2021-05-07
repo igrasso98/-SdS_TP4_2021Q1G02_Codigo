@@ -55,8 +55,11 @@ public class Oscillator extends Serializable {
     private Step calculateFirstStep() {
         return new Step(
                 Collections.singletonMap(this.particle.getId(), this.particle),
-                Collections.singletonMap(this.particle, this.particle.getPosition()),
-                Collections.singletonMap(this.particle, this.particle.getVelocity()),
+
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+//                Collections.singletonMap(this.particle, this.particle.getPosition()),
+//                Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
                 this.dt,
                 0,
