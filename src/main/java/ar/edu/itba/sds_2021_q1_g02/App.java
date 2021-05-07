@@ -10,10 +10,11 @@ public class App {
     private static final double OSCILLATOR_DT = 0.0001;
     private static final double OSCILLATOR_SERIALIZE_EVERY = 0.01;
     private static final OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
-            step -> "R:/output/oscillator.tsv",
+            step -> "R:/output/oscillator_1.tsv",
             App.OSCILLATOR_SERIALIZE_EVERY
     );
     private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10000, 100);
+    private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
 
     public static void main(String[] args) throws ParseException, IOException {
 //        CommandParser.getInstance().parse(args);
@@ -81,17 +82,22 @@ public class App {
     }
 
     private static void oscillatorSimulation() {
-        Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE));
-        Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE));
-        Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE));
-        Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE));
-        Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE));
-        Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution());
+        App.oscillatorSimulation1();
+        App.oscillatorSimulation2();
+    }
+
+    private static void oscillatorSimulation1() {
+        Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+        Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+//        Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+//        Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+        Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+        Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution(), App.OSCILLATOR_DT);
 
         App.putOscillatorSerializers(eulerOscillator);
         App.putOscillatorSerializers(eulerVelocityOscillator);
-        App.putOscillatorSerializers(beemanOscillator);
-        App.putOscillatorSerializers(verletOscillator);
+//        App.putOscillatorSerializers(beemanOscillator);
+//        App.putOscillatorSerializers(verletOscillator);
         App.putOscillatorSerializers(gearPredictorOscillator);
         App.putOscillatorSerializers(realOscillator);
 
@@ -99,17 +105,51 @@ public class App {
         eulerOscillator.simulate();
         System.out.println("Simulating euler velocity");
         eulerVelocityOscillator.simulate();
-        System.out.println("Simulating beeman");
-        beemanOscillator.simulate();
-        System.out.println("Simulating verlet");
-        verletOscillator.simulate();
+//        System.out.println("Simulating beeman");
+//        beemanOscillator.simulate();
+//        System.out.println("Simulating verlet");
+//        verletOscillator.simulate();
         System.out.println("Simulating gear predictor");
         gearPredictorOscillator.simulate();
         System.out.println("Simulating real");
         realOscillator.simulate();
 
-        System.out.println("Dumping results");
+        System.out.println("Dumping results 1.1/1.2");
         App.dumpOscillatorResults();
+    }
+
+    private static void oscillatorSimulation2() {
+        for (double dt : App.OSCILLATOR_DTS) {
+            OscillatorSerializer serializer = new OscillatorSerializer(
+                    step -> "R:/output/oscillator_2_" + dt + ".tsv",
+                    App.OSCILLATOR_SERIALIZE_EVERY
+            );
+
+            Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE), dt);
+            Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE), dt);
+//            Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), dt);
+//            Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), dt);
+            Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE), dt);
+            Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution(), dt);
+
+            eulerOscillator.addSerializer(serializer);
+            eulerVelocityOscillator.addSerializer(serializer);
+//            beemanOscillator.addSerializer(serializer);
+//            verletOscillator.addSerializer(serializer);
+            gearPredictorOscillator.addSerializer(serializer);
+            realOscillator.addSerializer(serializer);
+
+            System.out.println("Simulating 1.3 with dt = " + dt);
+            eulerOscillator.simulate();
+            eulerVelocityOscillator.simulate();
+//            beemanOscillator.simulate();
+//            verletOscillator.simulate();
+            gearPredictorOscillator.simulate();
+            realOscillator.simulate();
+
+            System.out.println("Dumping 1.3");
+            serializer.finish();
+        }
     }
 
     private static Color getParticleColor(Particle particle) {
@@ -173,11 +213,11 @@ public class App {
         );
     }
 
-    private static Oscillator getOscillatorSystem(IntegrationAlgorithm integrationAlgorithm) {
+    private static Oscillator getOscillatorSystem(IntegrationAlgorithm integrationAlgorithm, double dt) {
         return new Oscillator(
                 App.getOscillatorParticle(),
                 integrationAlgorithm,
-                App.OSCILLATOR_DT,
+                dt,
                 5
         );
     }
