@@ -15,6 +15,7 @@ def graph_systems(systems, times, algos):
     plt.xlabel('Tiempo [s]')
     plt.ylabel('Distancia al centro [m]')
     plt.xticks([0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])
+    plt.yticks([-1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0])
     plt.legend(loc='upper right')
     plt.tight_layout()
     plt.show()
