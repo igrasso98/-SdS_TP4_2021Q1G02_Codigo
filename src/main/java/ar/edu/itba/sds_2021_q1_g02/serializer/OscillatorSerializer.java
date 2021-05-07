@@ -12,13 +12,14 @@ import java.util.*;
 
 public class OscillatorSerializer extends Serializer {
     private final FileFormatter fileFormatter;
-    private final TreeMap<Double, Map<IntegrationAlgorithm, Position>> results = new TreeMap<>();
-    private final List<IntegrationAlgorithm> integrationAlgorithms = new LinkedList<>();
+    private TreeMap<Double, Map<IntegrationAlgorithm, Position>> results;
+    private List<IntegrationAlgorithm> integrationAlgorithms;
 
     public OscillatorSerializer(FileFormatter fileFormatter, double serializeEvery) {
         super(serializeEvery);
 
         this.fileFormatter = fileFormatter;
+        this.reset();
     }
 
     public void finish() {
@@ -59,6 +60,8 @@ public class OscillatorSerializer extends Serializer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        this.reset();
     }
 
     @Override
@@ -72,5 +75,11 @@ public class OscillatorSerializer extends Serializer {
 
         Particle particle = particles.stream().findFirst().get();
         this.results.computeIfAbsent(step.getAbsoluteTime(), abs -> new HashMap<>()).put(step.getIntegrationAlgorithm(), particle.getPosition());
+    }
+
+    public void reset() {
+        this.integrationAlgorithms = new LinkedList<>();
+        this.results = new TreeMap<>();
+        this.restartCount();
     }
 }
