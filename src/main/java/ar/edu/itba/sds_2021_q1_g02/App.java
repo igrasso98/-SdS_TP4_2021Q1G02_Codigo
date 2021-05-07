@@ -23,6 +23,10 @@ public class App {
         App.oscillatorSimulation();
         System.out.println("--------------------------------------");
 
+//        System.out.println("------------- RADIATION -------------");
+//        App.radiationSimulation();
+//        System.out.println("--------------------------------------");
+
 //        GD.addSerializer(new OvitoSerializer(
 //                (systemParticles, step) -> (systemParticles.size() + 2) + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
 //                        ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
@@ -89,15 +93,15 @@ public class App {
     private static void oscillatorSimulation1() {
         Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
         Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
-//        Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
-//        Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+        Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
+        Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
         Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE), App.OSCILLATOR_DT);
         Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution(), App.OSCILLATOR_DT);
 
         App.putOscillatorSerializers(eulerOscillator);
         App.putOscillatorSerializers(eulerVelocityOscillator);
-//        App.putOscillatorSerializers(beemanOscillator);
-//        App.putOscillatorSerializers(verletOscillator);
+        App.putOscillatorSerializers(beemanOscillator);
+        App.putOscillatorSerializers(verletOscillator);
         App.putOscillatorSerializers(gearPredictorOscillator);
         App.putOscillatorSerializers(realOscillator);
 
@@ -105,10 +109,10 @@ public class App {
         eulerOscillator.simulate();
         System.out.println("Simulating euler velocity");
         eulerVelocityOscillator.simulate();
-//        System.out.println("Simulating beeman");
-//        beemanOscillator.simulate();
-//        System.out.println("Simulating verlet");
-//        verletOscillator.simulate();
+        System.out.println("Simulating beeman");
+        beemanOscillator.simulate();
+        System.out.println("Simulating verlet");
+        verletOscillator.simulate();
         System.out.println("Simulating gear predictor");
         gearPredictorOscillator.simulate();
         System.out.println("Simulating real");
@@ -127,23 +131,23 @@ public class App {
 
             Oscillator eulerOscillator = App.getOscillatorSystem(new EulerIntegrationAlgorithm(App.DAMPED_FORCE), dt);
             Oscillator eulerVelocityOscillator = App.getOscillatorSystem(new EulerVelocityIntegrationAlgorithm(App.DAMPED_FORCE), dt);
-//            Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), dt);
-//            Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), dt);
+            Oscillator beemanOscillator = App.getOscillatorSystem(new BeemanAlgorithm(App.DAMPED_FORCE), dt);
+            Oscillator verletOscillator = App.getOscillatorSystem(new VerletIntegrationAlgorithm(App.DAMPED_FORCE), dt);
             Oscillator gearPredictorOscillator = App.getOscillatorSystem(new GearPredictorCorrectorIntegrationAlgorithm(App.DAMPED_FORCE), dt);
             Oscillator realOscillator = App.getOscillatorSystem(new OscillatorRealSolution(), dt);
 
             eulerOscillator.addSerializer(serializer);
             eulerVelocityOscillator.addSerializer(serializer);
-//            beemanOscillator.addSerializer(serializer);
-//            verletOscillator.addSerializer(serializer);
+            beemanOscillator.addSerializer(serializer);
+            verletOscillator.addSerializer(serializer);
             gearPredictorOscillator.addSerializer(serializer);
             realOscillator.addSerializer(serializer);
 
             System.out.println("Simulating 1.3 with dt = " + dt);
             eulerOscillator.simulate();
             eulerVelocityOscillator.simulate();
-//            beemanOscillator.simulate();
-//            verletOscillator.simulate();
+            beemanOscillator.simulate();
+            verletOscillator.simulate();
             gearPredictorOscillator.simulate();
             realOscillator.simulate();
 

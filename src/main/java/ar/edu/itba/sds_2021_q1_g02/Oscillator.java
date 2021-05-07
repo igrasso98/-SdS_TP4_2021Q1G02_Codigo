@@ -4,7 +4,7 @@ import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.serializer.Serializable;
 import javafx.util.Pair;
 
-import java.util.*;
+import java.util.Collections;
 
 public class Oscillator extends Serializable {
     private final static double EPSILON = 1e-10;
@@ -36,12 +36,7 @@ public class Oscillator extends Serializable {
     }
 
     private Step simulateStep(Step previousStep) {
-        Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.particle, previousStep);
-
-        this.particle.setPosition(newVelocityPositions.getKey());
-        this.particle.setVelocity(newVelocityPositions.getValue());
-
-        return new Step(
+        Step newStep = new Step(
                 Collections.singletonMap(this.particle.getId(), this.particle),
                 Collections.singletonMap(this.particle, this.particle.getPosition()),
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
@@ -50,6 +45,13 @@ public class Oscillator extends Serializable {
                 previousStep.getStep() + 1,
                 this.integrationAlgorithm
         );
+
+        Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.particle, previousStep);
+
+        this.particle.setPosition(newVelocityPositions.getKey());
+        this.particle.setVelocity(newVelocityPositions.getValue());
+
+        return newStep;
     }
 
     private Step calculateFirstStep() {
