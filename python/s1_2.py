@@ -7,7 +7,7 @@ DT_S_STRING = ['0.01', '0.001', '1.0E-4', '1.0E-5', '1.0E-6']
 
 
 def internal_graph_system(data, label, color):
-    plt.loglog(DT_S, data, label=label.replace('"', ''), color=color)
+    plt.loglog(DT_S, data, marker='o', label=label.replace('"', ''), color=color)
 
 
 def graph_systems(ecms, algos):
