@@ -52,12 +52,12 @@ public class ParticleElectrostaticForceCalculator implements ForceCalculator {
     }
 
     private Pair<Double, Double> sumTerm(Particle particle, Particle target) {
-        double magnitude = particle.distanceTo(target);
-        double abs = particle.getCharge().getCharge() / magnitude;
+        double r = particle.distanceTo(target);
+        double value = particle.getCharge().getCharge() / Math.pow(r, 3);
 
         return new Pair<>(
-                abs * (particle.getPosition().getX() - target.getPosition().getX()),
-                abs * (particle.getPosition().getY() - target.getPosition().getY())
+                value * (target.getPosition().getX() - particle.getPosition().getX()),
+                value * (target.getPosition().getY() - particle.getPosition().getY())
         );
     }
 

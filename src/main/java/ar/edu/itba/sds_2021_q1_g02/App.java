@@ -228,6 +228,9 @@ public class App {
     }
 
     private static Color getParticleColor(Particle particle) {
+        if (particle.getId() == 0)
+            return new Color(0, 0, 1.0);
+
         if (particle.getCharge() == null || particle.getCharge().equals(ParticleCharge.NEGATIVE)) {
             return new Color(1.0, 0, 0);
         } else {

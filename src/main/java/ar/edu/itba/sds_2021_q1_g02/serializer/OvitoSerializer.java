@@ -1,10 +1,12 @@
 package ar.edu.itba.sds_2021_q1_g02.serializer;
 
-import ar.edu.itba.sds_2021_q1_g02.models.*;
+import ar.edu.itba.sds_2021_q1_g02.models.Particle;
+import ar.edu.itba.sds_2021_q1_g02.models.Step;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 public class OvitoSerializer extends Serializer {
     private final StepFormatter stepFormatter;
@@ -30,8 +32,8 @@ public class OvitoSerializer extends Serializer {
 
         try {
             file.getParentFile().mkdirs();
-            if (!file.mkdirs())
-                throw new RuntimeException("Couldn't create file: " + file.getName());
+//            if (!file.mkdirs())
+//                throw new RuntimeException("Couldn't create file: " + file.getName());
 
             FileWriter writer = new FileWriter(file);
 
