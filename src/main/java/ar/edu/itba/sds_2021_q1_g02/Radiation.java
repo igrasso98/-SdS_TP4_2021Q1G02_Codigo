@@ -35,7 +35,7 @@ public class Radiation extends Simulation {
         Step step = this.calculateFirstStep();
         this.serialize(this.particles, step);
 
-        while (step.getAbsoluteTime() < 5e-12) {
+        while (this.continueSimulation()) {
             step = this.simulateStep(step);
             if (step.getAbsoluteTime() >= 5e-12)
                 step.setLastStep(true);
@@ -71,5 +71,28 @@ public class Radiation extends Simulation {
                 0,
                 this.integrationAlgorithm
         );
+    }
+
+    private boolean continueSimulation() {
+        return this.isImpactParticleInside() || this.isImpactParticleTooClose();
+    }
+
+    private boolean isImpactParticleInside() {
+        return this.impactParticle.getPosition().getX() >= 0
+                && this.impactParticle.getPosition().getX() <= (Constants.L + Constants.D)
+                && this.impactParticle.getPosition().getY() >= 0
+                && this.impactParticle.getPosition().getY() <= Constants.L;
+    }
+
+    private boolean isImpactParticleTooClose() {
+        for (Particle particle : this.particles) {
+            if (!particle.equals(this.impactParticle)) {
+                if (this.impactParticle.distanceTo(particle) < 0.01 * Constants.D) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
