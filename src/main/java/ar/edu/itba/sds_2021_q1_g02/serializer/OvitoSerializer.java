@@ -30,7 +30,7 @@ public class OvitoSerializer extends Serializer {
 
         try {
             file.getParentFile().mkdirs();
-            if (!file.createNewFile())
+            if (!file.mkdirs())
                 throw new RuntimeException("Couldn't create file: " + file.getName());
 
             FileWriter writer = new FileWriter(file);
