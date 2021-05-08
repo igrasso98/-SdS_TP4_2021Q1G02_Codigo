@@ -23,9 +23,9 @@ public class App {
     private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10000, 100);
     private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
 
-    private static final double RADIATION_DT = 0.001;
+    private static final double RADIATION_DT = 1e-15;
     private static final double RADIATION_RADIUS = 0.25;
-    private static final double RADIATION_SERIALIZE_EVERY = 0.01;
+    private static final double RADIATION_SERIALIZE_EVERY = 1e-14;
 
     public static void main(String[] args) throws ParseException, IOException {
         CommandParser.getInstance().parse(args);
@@ -228,9 +228,6 @@ public class App {
     }
 
     private static Color getParticleColor(Particle particle) {
-        if (particle.getId() == 0)
-            return new Color(0, 0, 1.0);
-
         if (particle.getCharge() == null || particle.getCharge().equals(ParticleCharge.NEGATIVE)) {
             return new Color(1.0, 0, 0);
         } else {

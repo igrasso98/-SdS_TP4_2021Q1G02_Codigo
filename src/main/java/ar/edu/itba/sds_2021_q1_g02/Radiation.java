@@ -21,9 +21,10 @@ public class Radiation extends Simulation {
         this.integrationAlgorithm = integrationAlgorithm;
         this.dt = dt;
 
-        this.particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL);
+        this.particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL + 1);
         for (Particle[] row : this.particlesMatrix) {
-            this.particles.addAll(Arrays.asList(row));
+            Collection<Particle> rowCollection = Arrays.asList(row);
+            this.particles.addAll(rowCollection);
         }
         this.particles.add(impactParticle);
     }
@@ -34,9 +35,9 @@ public class Radiation extends Simulation {
         Step step = this.calculateFirstStep();
         this.serialize(this.particles, step);
 
-        while (step.getAbsoluteTime() < 5) {
+        while (step.getAbsoluteTime() < 5e-12) {
             step = this.simulateStep(step);
-            if (step.getAbsoluteTime() >= 5)
+            if (step.getAbsoluteTime() >= 5e-12)
                 step.setLastStep(true);
 
             this.serialize(this.particles, step);
@@ -53,12 +54,10 @@ public class Radiation extends Simulation {
                 this.integrationAlgorithm
         );
 
-        for (Particle particle : this.particles) {
-            Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(particle, previousStep);
+        Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.impactParticle, previousStep);
 
-            particle.setPosition(newVelocityPositions.getKey());
-            particle.setVelocity(newVelocityPositions.getValue());
-        }
+        this.impactParticle.setPosition(newVelocityPositions.getKey());
+        this.impactParticle.setVelocity(newVelocityPositions.getValue());
 
         return newStep;
     }
