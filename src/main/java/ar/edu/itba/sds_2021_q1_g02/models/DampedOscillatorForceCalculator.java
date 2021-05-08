@@ -27,6 +27,6 @@ public class DampedOscillatorForceCalculator implements ForceCalculator {
 
     @Override
     public boolean isVelocityDependant() {
-        return true;
+        return false;
     }
 }

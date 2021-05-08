@@ -1,9 +1,8 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import javafx.util.Pair;
+
+import java.util.*;
 
 public class Particle {
     private final int id;
@@ -95,7 +94,7 @@ public class Particle {
     public double distanceTo(Particle other) {
         double ctr_dist = Math.sqrt(
                 Math.pow(this.position.getX() - other.position.getX(), 2)
-                + Math.pow(this.position.getY() - other.position.getY(), 2)
+                        + Math.pow(this.position.getY() - other.position.getY(), 2)
         );
 
         return (ctr_dist - this.getRadius()) - other.getRadius();

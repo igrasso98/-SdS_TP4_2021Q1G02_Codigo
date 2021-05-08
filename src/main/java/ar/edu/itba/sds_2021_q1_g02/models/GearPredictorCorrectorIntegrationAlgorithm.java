@@ -11,7 +11,7 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
     static private final int SECOND_DERIVATIVE = 2;
     static private final int THIRD_DERIVATIVE = 3;
     static private final int FOURTH_DERIVATIVE = 4;
-    static private final int[] factorials = {1, 1, 2, 6, 24, 120};
+    static private final double[] factorials = {1.0, 1.0, 2.0, 6.0, 24.0, 120.0};
     static private double[] alphas = {3.0 / 20.0, 251.0 / 360.0, 1.0, 11.0 / 18.0, 1.0 / 6.0, 1.0 / 60.0};
     private final ForceCalculator forceCalculator;
 
@@ -33,16 +33,32 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
     }
 
     private List<Pair<Double, Double>> predictAndCorrect(Particle particle, Step step) {
+
         List<Pair<Double, Double>> derivatives = this.calculateDerivatives(particle);
+
         List<Pair<Double, Double>> predictions = this.predict(derivatives, step.getRelativeTime());
 
-        double accelerationX =
-                (derivatives.get(2).getKey() - predictions.get(2).getKey()) * (Math.pow(step.getRelativeTime(), 2) / 2);
-        double accelerationY =
-                (derivatives.get(2).getValue() - predictions.get(2).getValue()) * (Math.pow(step.getRelativeTime(),
-                        2) / 2);
 
-        return this.correct(predictions, accelerationX, accelerationY, step.getRelativeTime());
+        Pair<Double, Double> deltaR2 = this.calculateDeltaR2(predictions, particle.getMass(), step.getRelativeTime());
+
+        List<Pair<Double, Double>> corrections = this.correct(predictions, deltaR2,
+                step.getRelativeTime());
+
+        return corrections;
+    }
+
+    private Pair<Double, Double> calculateDeltaR2(List<Pair<Double, Double>> predictions, double mass,
+                                                  double step) {
+        Double accelerationPX = this.forceCalculator.calculate(predictions.get(0).getKey(),
+                predictions.get(1).getKey()) / mass;
+        Double accelerationPY = this.forceCalculator.calculate(predictions.get(0).getValue(),
+                predictions.get(1).getValue()) / mass;
+
+        double accelerationX = (accelerationPX - predictions.get(2).getKey()) * (Math.pow(step, 2) / 2);
+        double accelerationY = (accelerationPY - predictions.get(2).getValue()) * (Math.pow(step, 2) / 2);
+
+        return new Pair<>(accelerationX, accelerationY);
+
     }
 
     private List<Pair<Double, Double>> calculateDerivatives(Particle particle) {
@@ -73,8 +89,7 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         return derivatives;
     }
 
-    private List<Pair<Double, Double>> correct(List<Pair<Double, Double>> predictions,
-                                               double accelerationX, double accelerationY,
+    private List<Pair<Double, Double>> correct(List<Pair<Double, Double>> predictions, Pair<Double, Double> deltaR2,
                                                double dt) {
         if (this.forceCalculator.isVelocityDependant()) {
             alphas[0] = 3.0 / 16.0;
@@ -82,8 +97,8 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
         List<Pair<Double, Double>> corrections = new ArrayList<>();
         for (int i = 0; i < predictions.size(); i++) {
             corrections.add(new Pair<>(
-                    predictions.get(i).getKey() + (alphas[i] * accelerationX * (factorials[i] / Math.pow(dt, i))),
-                    predictions.get(i).getValue() + (alphas[i] * accelerationY * (factorials[i] / Math.pow(dt, i)))
+                    predictions.get(i).getKey() + (alphas[i] * deltaR2.getKey() * (factorials[i] / Math.pow(dt, i))),
+                    predictions.get(i).getValue() + (alphas[i] * deltaR2.getValue() * (factorials[i] / Math.pow(dt, i)))
             ));
         }
         return corrections;
