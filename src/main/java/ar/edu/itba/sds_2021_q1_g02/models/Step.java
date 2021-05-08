@@ -3,7 +3,6 @@ package ar.edu.itba.sds_2021_q1_g02.models;
 import java.util.Map;
 
 public class Step {
-    private final Map<Integer, Particle> particleMap;
     private final Map<Particle, Position> previousParticlesPosition;
     private final Map<Particle, Velocity> previousParticlesVelocity;
     private double deltaTime;
@@ -12,10 +11,9 @@ public class Step {
     private final IntegrationAlgorithm integrationAlgorithm;
     private boolean isLastStep = false;
 
-    public Step(Map<Integer, Particle> particleMap, Map<Particle, Position> previousParticlesPosition, Map<Particle,
+    public Step(Map<Particle, Position> previousParticlesPosition, Map<Particle,
             Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step,
                 IntegrationAlgorithm integrationAlgorithm) {
-        this.particleMap = particleMap;
         this.previousParticlesPosition = previousParticlesPosition;
         this.previousParticlesVelocity = previousParticlesVelocity;
 
@@ -59,7 +57,6 @@ public class Step {
 
     public Step copy() {
         return new Step(
-                this.particleMap,
                 this.previousParticlesPosition,
                 this.previousParticlesVelocity,
                 this.deltaTime,

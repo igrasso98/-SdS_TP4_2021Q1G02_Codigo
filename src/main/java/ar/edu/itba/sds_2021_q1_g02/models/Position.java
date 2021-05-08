@@ -13,14 +13,30 @@ public class Position {
     public double getX() {
         return this.x;
     }
+
+    public int getRoundedX() {
+        return (int) Math.round(this.x);
+    }
+
     public void setX(double x) { this.x  = x;}
 
     public double getY() {
         return this.y;
     }
 
+    public int getRoundedY() {
+        return (int) Math.round(this.y);
+    }
+
     public void setY(double y) {
         this.y = y;
+    }
+
+    public Position add(Position offset) {
+        return new Position(
+                this.x + offset.x,
+                this.y + offset.y
+        );
     }
 
     public Position copy() {
@@ -30,5 +46,12 @@ public class Position {
     @Override
     public String toString() {
         return String.format("(%.5f, %.5f)", this.x, this.y);
+    }
+
+    public Position multiply(double d) {
+        return new Position(
+                this.x * d,
+                this.y * d
+        );
     }
 }

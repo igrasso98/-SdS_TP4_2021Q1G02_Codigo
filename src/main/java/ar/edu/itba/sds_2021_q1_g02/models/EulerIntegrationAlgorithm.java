@@ -12,13 +12,15 @@ public class EulerIntegrationAlgorithm implements IntegrationAlgorithm {
 
     @Override
     public Pair<Position, Velocity> perform(Particle particle, Step step) {
+        Pair<Double, Double> force = this.forceCalculator.calculatePair(particle);
+
         Position newPosition = new Position(
-                this.calculatePosition(particle, particle.getVelocity().getxSpeed(), particle.getPosition().getX(), step.getRelativeTime(), this.forceCalculator.calculateX(particle)),
-                this.calculatePosition(particle, particle.getVelocity().getySpeed(), particle.getPosition().getY(), step.getRelativeTime(), this.forceCalculator.calculateY(particle))
+                this.calculatePosition(particle, particle.getVelocity().getxSpeed(), particle.getPosition().getX(), step.getRelativeTime(), force.getKey()),
+                this.calculatePosition(particle, particle.getVelocity().getySpeed(), particle.getPosition().getY(), step.getRelativeTime(), force.getValue())
         );
         Velocity newVelocity = new Velocity(
-                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step.getRelativeTime(), this.forceCalculator.calculateX(particle)),
-                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step.getRelativeTime(), this.forceCalculator.calculateY(particle))
+                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step.getRelativeTime(), force.getKey()),
+                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step.getRelativeTime(), force.getValue())
         );
 
         return new Pair<>(newPosition, newVelocity);

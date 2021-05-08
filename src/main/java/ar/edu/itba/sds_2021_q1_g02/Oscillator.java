@@ -1,14 +1,11 @@
 package ar.edu.itba.sds_2021_q1_g02;
 
 import ar.edu.itba.sds_2021_q1_g02.models.*;
-import ar.edu.itba.sds_2021_q1_g02.serializer.Serializable;
 import javafx.util.Pair;
 
 import java.util.Collections;
 
-public class Oscillator extends Serializable {
-    private final static double EPSILON = 1e-10;
-
+public class Oscillator extends Simulation {
     private final Particle particle;
     private final IntegrationAlgorithm integrationAlgorithm;
     private final double dt;
@@ -21,6 +18,7 @@ public class Oscillator extends Serializable {
         this.maxTime = maxTime;
     }
 
+    @Override
     public void simulate() {
         this.serializeSystem(Collections.singletonList(this.particle), this.integrationAlgorithm);
         Step step = this.calculateFirstStep();
@@ -37,7 +35,6 @@ public class Oscillator extends Serializable {
 
     private Step simulateStep(Step previousStep) {
         Step newStep = new Step(
-                Collections.singletonMap(this.particle.getId(), this.particle),
                 Collections.singletonMap(this.particle, this.particle.getPosition()),
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
@@ -56,14 +53,10 @@ public class Oscillator extends Serializable {
 
     private Step calculateFirstStep() {
         return new Step(
-                Collections.singletonMap(this.particle.getId(), this.particle),
-
                 Collections.emptyMap(),
                 Collections.emptyMap(),
-//                Collections.singletonMap(this.particle, this.particle.getPosition()),
-//                Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
-                this.dt,
+                0,
                 0,
                 this.integrationAlgorithm
         );

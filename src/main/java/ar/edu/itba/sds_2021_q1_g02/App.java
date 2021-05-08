@@ -1,10 +1,17 @@
 package ar.edu.itba.sds_2021_q1_g02;
 
 import ar.edu.itba.sds_2021_q1_g02.models.*;
+import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
+import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
+import javafx.util.Pair;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class App {
     private static final double OSCILLATOR_DT = 0.0001;
@@ -16,73 +23,20 @@ public class App {
     private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10000, 100);
     private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
 
+    private static final double RADIATION_DT = 0.001;
+    private static final double RADIATION_RADIUS = 0.25;
+    private static final double RADIATION_SERIALIZE_EVERY = 0.01;
+
     public static void main(String[] args) throws ParseException, IOException {
-//        CommandParser.getInstance().parse(args);
+        CommandParser.getInstance().parse(args);
 
-        System.out.println("------------- OSCILLATOR -------------");
-        App.oscillatorSimulation();
-        System.out.println("--------------------------------------");
-
-//        System.out.println("------------- RADIATION -------------");
-//        App.radiationSimulation();
+//        System.out.println("------------- OSCILLATOR -------------");
+//        App.oscillatorSimulation();
 //        System.out.println("--------------------------------------");
 
-//        GD.addSerializer(new OvitoSerializer(
-//                (systemParticles, step) -> (systemParticles.size() + 2) + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
-//                        ":2:Velocity:R:2:mass:R:1:color:R:3:transparency:R:1",
-//                (particle, step) -> {
-//                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
-//                    String s = particle.getId() + "\t" +
-//                            particle.getRadius() + "\t" +
-//                            particle.getPosition().getX() + "\t" +
-//                            particle.getPosition().getY() + "\t" +
-//                            particle.getVelocity().getxSpeed() + "\t" +
-//                            particle.getVelocity().getySpeed() + "\t" +
-//                            particle.getMass() + "\t";
-//
-//                    if (particle.getId() >= 0) {
-//                        Color color = getParticleColor(particle, dimen);
-//                        s += color.getRed() + "\t" +
-//                                color.getGreen() + "\t" +
-//                                color.getBlue() + "\t" +
-//                                "0.0";
-//                    } else {
-//                        s += "0.0\t0.0\t0.0\t1.0";
-//                    }
-//
-//                    return s;
-//                },
-//                step -> "output/output_" + step + ".xyz",
-//                dimen
-//        ));
-
-//        GD.addSerializer(new ConsoleSerializer(
-//                (systemParticles, configuration) -> {
-//                    return "Height = " + String.format("%.5f",
-//                            configuration.getDimen().getYvf() - configuration.getDimen().getYvi()) +
-//                            "m; Width = " + String.format("%.5f",
-//                            configuration.getDimen().getXvf() - configuration.getDimen().getXvi()) +
-//                            "m; Aperture size = " + String.format("%.5f",
-//                            configuration.getDimen().getApertureYvf() - configuration.getDimen().getApertureYvi()) +
-//                            "m; Aperture X position = " + String.format("%.5f",
-//                            configuration.getDimen().getApertureX()) +
-//                            "m; Occupation factor tolerance = " + String.format("%.5f",
-//                            configuration.getOccupationFactor());
-//                },
-//                (stepParticles, step) -> {
-//                    return "** Step = " + step.getStep() +
-//                            "; dT = " + String.format("%.5fs", step.getRelativeTime()) +
-//                            "; abs = " + String.format("%.5fs", step.getAbsoluteTime()) +
-//                            "; fp = " + String.format("%.5f", step.getLeftOccupationFactor());
-//                },
-//                (particle, step) -> {
-//                    return particle.getId() + " | " +
-//                            String.format("(%.5f, %.5f)m", particle.getPosition().getX(),
-//                                    particle.getPosition().getY()) + " | " +
-//                            String.format("(%.5f, %.5f)m/s", particle.getVelocity().getxSpeed(),
-//                                    particle.getVelocity().getySpeed());
-//                }
-//        ));
+        System.out.println("------------- RADIATION -------------");
+        App.radiationSimulation();
+        System.out.println("--------------------------------------");
     }
 
     private static void oscillatorSimulation() {
@@ -156,12 +110,48 @@ public class App {
         }
     }
 
-    private static Color getParticleColor(Particle particle) {
-        if (particle.getCharge() == null || particle.getCharge().equals(ParticleCharge.NEGATIVE)) {
-            return new Color(1.0, 0, 0);
-        } else {
-            return new Color(0, 1.0, 0);
+    private static void radiationSimulation() throws IOException {
+        Pair<Particle[][], Double> particlesAndV0 = ParticleParser.parseParticles(CommandParser.getInstance().getInputPath(), new Position(Constants.D, 0));
+        Particle impactParticle = App.getImpactParticle(particlesAndV0.getValue());
+
+        Collection<Particle> particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL);
+        for (Particle[] row : particlesAndV0.getKey()) {
+            particles.addAll(Arrays.asList(row));
         }
+
+        Radiation radiation = new Radiation(
+                particlesAndV0.getKey(),
+                impactParticle,
+                new EulerIntegrationAlgorithm(new ParticleElectrostaticForceCalculator(particles)),
+                App.RADIATION_DT
+        );
+
+        radiation.addSerializer(new OvitoSerializer(
+                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
+                        ":2:Velocity:R:2:color:R:3",
+                (particle, step) -> {
+                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
+                    String s = particle.getId() + "\t" +
+                            App.RADIATION_RADIUS + "\t" +
+                            particle.getPosition().getX() / Constants.D + "\t" +
+                            particle.getPosition().getY() / Constants.D + "\t" +
+                            particle.getVelocity().getxSpeed() / Constants.D + "\t" +
+                            particle.getVelocity().getySpeed() / Constants.D + "\t";
+
+                    Color color = getParticleColor(particle);
+                    s += color.getRed() + "\t" +
+                            color.getGreen() + "\t" +
+                            color.getBlue();
+
+                    return s;
+                },
+                step -> "R:/output/radiation_1_" + step + ".xyz",
+                RADIATION_SERIALIZE_EVERY
+        ));
+
+        System.out.println("Simulating radiation");
+        radiation.simulate();
+        System.out.println("Dumping radiation results");
     }
 
     private static void putOscillatorSerializers(Oscillator oscillator) {
@@ -224,5 +214,24 @@ public class App {
                 dt,
                 5
         );
+    }
+
+    private static Particle getImpactParticle(double V0) {
+        return new Particle(
+                0,
+                0,
+                Constants.RADIATION_PARTICLE_MASS,
+                Constants.RADIATION_PARTICLE_POSITION.copy(),
+                new Velocity(V0, 0),
+                ParticleCharge.POSITIVE
+        );
+    }
+
+    private static Color getParticleColor(Particle particle) {
+        if (particle.getCharge() == null || particle.getCharge().equals(ParticleCharge.NEGATIVE)) {
+            return new Color(1.0, 0, 0);
+        } else {
+            return new Color(0, 1.0, 0);
+        }
     }
 }

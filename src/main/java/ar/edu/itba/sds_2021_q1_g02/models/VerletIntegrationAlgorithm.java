@@ -38,12 +38,14 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     }
 
     private Position calculatePositions(Step step, Particle particle, Particle previousParticleState) {
+        Pair<Double, Double> force = this.forceCalculator.calculatePair(particle);
+
         double positionX = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getX(),
-                previousParticleState.getPosition().getX(), this.forceCalculator.calculateX(particle),
+                previousParticleState.getPosition().getX(), force.getKey(),
                 particle.getMass());
 
         double positionY = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getY(),
-                previousParticleState.getPosition().getY(), this.forceCalculator.calculateY(particle),
+                previousParticleState.getPosition().getY(), force.getValue(),
                 particle.getMass());
 
         return new Position(positionX, positionY);

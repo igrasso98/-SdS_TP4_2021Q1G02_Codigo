@@ -52,29 +52,36 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
 
     private Position calculatePositions(double dt, Particle currentParticleState,
                                         Particle previousParticleState) {
+        Pair<Double, Double> previousForce = this.forceCalculator.calculatePair(previousParticleState);
+        Pair<Double, Double> currentForce = this.forceCalculator.calculatePair(currentParticleState);
+
         double positionX = this.calculatePosition(dt, currentParticleState.getPosition().getX(),
-                currentParticleState.getVelocity().getxSpeed(), this.forceCalculator.calculateX(currentParticleState)
-                , this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
+                currentParticleState.getVelocity().getxSpeed(), currentForce.getKey(),
+                previousForce.getKey(), currentParticleState.getMass());
 
         double positionY = this.calculatePosition(dt, currentParticleState.getPosition().getY(),
-                currentParticleState.getVelocity().getySpeed(), this.forceCalculator.calculateY(currentParticleState)
-                , this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
+                currentParticleState.getVelocity().getySpeed(), currentForce.getValue(),
+                previousForce.getValue(), currentParticleState.getMass());
 
         return new Position(positionX, positionY);
     }
 
     private Velocity calculateCorrectedVelocities(double dt, Particle currentParticleState,
                                                   Particle previousParticleState, Particle nextParticleState) {
+        Pair<Double, Double> previousForce = this.forceCalculator.calculatePair(previousParticleState);
+        Pair<Double, Double> currentForce = this.forceCalculator.calculatePair(currentParticleState);
+        Pair<Double, Double> nextForce = this.forceCalculator.calculatePair(nextParticleState);
+
         double velocityX = this.calculateCorrectedVelocity(dt, currentParticleState.getVelocity().getxSpeed(),
-                this.forceCalculator.calculateX(currentParticleState),
-                this.forceCalculator.calculateX(previousParticleState),
-                this.forceCalculator.calculateX(nextParticleState),
+                currentForce.getKey(),
+                previousForce.getKey(),
+                nextForce.getKey(),
                 currentParticleState.getMass());
 
         double velocityY = this.calculateCorrectedVelocity(dt, currentParticleState.getVelocity().getySpeed(),
-                this.forceCalculator.calculateY(currentParticleState),
-                this.forceCalculator.calculateY(previousParticleState),
-                this.forceCalculator.calculateY(nextParticleState),
+                currentForce.getValue(),
+                previousForce.getValue(),
+                nextForce.getValue(),
                 currentParticleState.getMass());
 
         return new Velocity(velocityX, velocityY);
@@ -82,13 +89,24 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
 
     private Velocity calculatePredictedVelocities(double dt, Particle currentParticleState,
                                                   Particle previousParticleState) {
-        double velocityX = this.calculatePredictedVelocity(dt, currentParticleState.getVelocity().getxSpeed(),
-                this.forceCalculator.calculateX(currentParticleState),
-                this.forceCalculator.calculateX(previousParticleState), currentParticleState.getMass());
+        Pair<Double, Double> previousForce = this.forceCalculator.calculatePair(previousParticleState);
+        Pair<Double, Double> currentForce = this.forceCalculator.calculatePair(currentParticleState);
 
-        double velocityY = this.calculatePredictedVelocity(dt, currentParticleState.getVelocity().getySpeed(),
-                this.forceCalculator.calculateY(currentParticleState),
-                this.forceCalculator.calculateY(previousParticleState), currentParticleState.getMass());
+        double velocityX = this.calculatePredictedVelocity(
+                dt,
+                currentParticleState.getVelocity().getxSpeed(),
+                currentForce.getKey(),
+                previousForce.getKey(),
+                currentParticleState.getMass()
+        );
+
+        double velocityY = this.calculatePredictedVelocity(
+                dt,
+                currentParticleState.getVelocity().getySpeed(),
+                currentForce.getValue(),
+                previousForce.getValue(),
+                currentParticleState.getMass()
+        );
 
         return new Velocity(velocityX, velocityY);
     }
