@@ -4,10 +4,7 @@ import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.RadiationInput;
-import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationEnergySerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationTrajectorySerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.*;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
@@ -37,6 +34,10 @@ public class App {
     );
     private static final RadiationTrajectorySerializer RADIATION_3_TRAJECTORY_SERIALIZER = new RadiationTrajectorySerializer(
             step -> "R:/output/radiation_3.tsv",
+            App.RADIATION_SERIALIZE_EVERY
+    );
+    private static final RadiationEscapeProportionSerializer RADIATION_4_FACTOR_SERIALIZER = new RadiationEscapeProportionSerializer(
+            step -> "R:/output/radiation_4.tsv",
             App.RADIATION_SERIALIZE_EVERY
     );
 
@@ -158,8 +159,7 @@ public class App {
 
     private static void radiationSimulation() throws IOException {
 //        App.radiationSimulation1_2();
-        App.radiationSimulation3();
-//        App.radiationSimulation4();
+        App.radiationSimulation3_4();
     }
 
     private static void radiationSimulation1_2() throws IOException {
@@ -216,20 +216,22 @@ public class App {
         radiation.simulate();
     }
 
-    private static void radiationSimulation3() throws IOException {
+    private static void radiationSimulation3_4() throws IOException {
         App.RADIATION_3_TRAJECTORY_SERIALIZER.reset();
+        App.RADIATION_4_FACTOR_SERIALIZER.reset();
 
         for (double v0 : App.RADIATION_V0S) {
             System.out.println("Simulating radiation 3 with v0 = " + v0);
             for (double yOffset: App.RADIATION_Y_OFFSETS) {
-                App.radiationSimulation3(v0, yOffset * Constants.D);
+                App.radiationSimulation3_4(v0, yOffset * Constants.D);
             }
         }
 
         App.RADIATION_3_TRAJECTORY_SERIALIZER.finish();
+        App.RADIATION_4_FACTOR_SERIALIZER.finish();
     }
 
-    private static void radiationSimulation3(double V0, double yOffset) throws IOException {
+    private static void radiationSimulation3_4(double V0, double yOffset) throws IOException {
         RadiationInput radiationInput = ParticleParser.parseParticles(CommandParser.getInstance().getInputPath(), new Position(Constants.D, 0));
         Particle impactParticle = App.getImpactParticle(V0, yOffset);
 
@@ -246,6 +248,7 @@ public class App {
         );
 
         radiation.addSerializer(App.RADIATION_3_TRAJECTORY_SERIALIZER);
+        radiation.addSerializer(App.RADIATION_4_FACTOR_SERIALIZER);
         radiation.simulate();
     }
 

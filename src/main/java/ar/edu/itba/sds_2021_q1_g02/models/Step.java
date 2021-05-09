@@ -12,6 +12,7 @@ public class Step {
     private final IntegrationAlgorithm integrationAlgorithm;
     private double energyDifference;
     private boolean isLastStep = false;
+    private boolean impactParticleEscaped = false;
     private final double v0;
     private BigDecimal impactParticleTrajectory = BigDecimal.ZERO;
 
@@ -108,12 +109,19 @@ public class Step {
         this.deltaTime = relativeTime;
     }
 
-
     public boolean isLastStep() {
         return this.isLastStep;
     }
 
     public void setLastStep(boolean lastStep) {
         this.isLastStep = lastStep;
+    }
+
+    public boolean hasImpactParticleEscaped() {
+        return this.impactParticleEscaped;
+    }
+
+    public void setImpactParticleEscaped(boolean escaped) {
+        this.impactParticleEscaped = escaped;
     }
 }

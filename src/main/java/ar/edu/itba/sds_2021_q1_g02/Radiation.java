@@ -50,9 +50,11 @@ public class Radiation extends Simulation {
             step = this.simulateStep(step);
             step.setEnergyDifference(Math.abs(energyT0 - this.energyCalculator.calculateTotalEnergy(this.impactParticle)));
 
-            if (!this.continueSimulation())
+            if (!this.continueSimulation()) {
                 step.setLastStep(true);
-            if (!this.impactParticleInsideMaterial && this.impactParticle.getPosition().getX() >= Constants.D) {
+                if (!this.isImpactParticleTooClose())
+                    step.setImpactParticleEscaped(true);
+            } else if (!this.impactParticleInsideMaterial && this.impactParticle.getPosition().getX() >= Constants.D) {
                 this.impactParticleInsideMaterial = true;
             }
 
