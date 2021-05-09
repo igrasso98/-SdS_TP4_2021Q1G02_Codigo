@@ -17,6 +17,7 @@ public class Radiation extends Simulation {
     private final EnergyCalculator energyCalculator;
     private final BigDecimal dt;
     private boolean impactParticleInsideMaterial = false;
+    private final double v0;
 
     public Radiation(Particle[][] particlesMatrix, Particle impactParticle, IntegrationAlgorithm integrationAlgorithm
             , double dt) {
@@ -24,6 +25,8 @@ public class Radiation extends Simulation {
         this.impactParticle = impactParticle;
         this.integrationAlgorithm = integrationAlgorithm;
         this.dt = BigDecimal.valueOf(dt);
+
+        this.v0 = impactParticle.getVelocity().getxSpeed();
 
         this.particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL + 1);
         for (Particle[] row : this.particlesMatrix) {
@@ -64,11 +67,17 @@ public class Radiation extends Simulation {
                 this.dt,
                 previousStep.getAbsoluteTime().add(this.dt),
                 previousStep.getStep() + 1,
-                this.integrationAlgorithm
+                this.integrationAlgorithm,
+                this.v0
         );
 
         Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.impactParticle,
                 previousStep);
+
+        newStep.addImpactParticleTrajectory(
+                previousStep.getImpactParticleTotalTrajectory()
+                        .add(BigDecimal.valueOf(newVelocityPositions.getKey().distanceTo(this.impactParticle.getPosition())))
+        );
 
         this.impactParticle.setPosition(newVelocityPositions.getKey());
         this.impactParticle.setVelocity(newVelocityPositions.getValue());
@@ -83,7 +92,8 @@ public class Radiation extends Simulation {
                 this.dt,
                 BigDecimal.ZERO,
                 0,
-                this.integrationAlgorithm
+                this.integrationAlgorithm,
+                this.v0
         );
     }
 

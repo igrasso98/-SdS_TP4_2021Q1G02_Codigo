@@ -12,10 +12,18 @@ public class Step {
     private final IntegrationAlgorithm integrationAlgorithm;
     private double energyDifference;
     private boolean isLastStep = false;
+    private final double v0;
+    private BigDecimal impactParticleTrajectory = BigDecimal.ZERO;
 
     public Step(Map<Particle, Position> previousParticlesPosition, Map<Particle,
             Velocity> previousParticlesVelocity, BigDecimal deltaTime, BigDecimal absoluteTime, int step,
                 IntegrationAlgorithm integrationAlgorithm) {
+        this(previousParticlesPosition, previousParticlesVelocity, deltaTime, absoluteTime, step, integrationAlgorithm, 0);
+    }
+
+    public Step(Map<Particle, Position> previousParticlesPosition, Map<Particle,
+            Velocity> previousParticlesVelocity, BigDecimal deltaTime, BigDecimal absoluteTime, int step,
+                IntegrationAlgorithm integrationAlgorithm, double v0) {
         this.previousParticlesPosition = previousParticlesPosition;
         this.previousParticlesVelocity = previousParticlesVelocity;
 
@@ -23,14 +31,27 @@ public class Step {
         this.absoluteTime = absoluteTime;
         this.step = step;
         this.integrationAlgorithm = integrationAlgorithm;
+        this.v0 = v0;
     }
 
     public BigDecimal getRelativeTime() {
         return this.deltaTime;
     }
 
+    public double getV0() {
+        return this.v0;
+    }
+
     public BigDecimal getAbsoluteTime() {
         return this.absoluteTime;
+    }
+
+    public BigDecimal getImpactParticleTotalTrajectory() {
+        return this.impactParticleTrajectory;
+    }
+
+    public void addImpactParticleTrajectory(BigDecimal impactParticleTrajectory) {
+        this.impactParticleTrajectory = this.impactParticleTrajectory.add(impactParticleTrajectory);
     }
 
     public int getStep() {
@@ -66,14 +87,17 @@ public class Step {
     }
 
     public Step copy() {
-        return new Step(
+        Step step = new Step(
                 this.previousParticlesPosition,
                 this.previousParticlesVelocity,
                 this.deltaTime,
                 this.absoluteTime,
                 this.step,
-                this.integrationAlgorithm
+                this.integrationAlgorithm,
+                this.v0
         );
+        step.addImpactParticleTrajectory(this.impactParticleTrajectory);
+        return step;
     }
 
     public void setAbsoluteTime(BigDecimal absoluteTime) {
