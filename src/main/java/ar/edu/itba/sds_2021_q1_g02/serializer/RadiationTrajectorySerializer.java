@@ -43,12 +43,15 @@ public class RadiationTrajectorySerializer extends Serializer {
             // "abs rv0 std0 rv1 std1 ... rvn stdn";
             StringBuilder builder = new StringBuilder();
             builder.append("abs");
+            LinkedList<Double> v0s = new LinkedList<>();
             for (Double v0 : v0AbsRStd.keySet()) {
                 builder.append("\t\"");
                 builder.append(v0);
                 builder.append("\"\t\"std_");
                 builder.append(v0);
                 builder.append("\"");
+
+                v0s.add(v0);
             }
             writer.write(builder + "\n");
 
@@ -58,11 +61,16 @@ public class RadiationTrajectorySerializer extends Serializer {
             for (Map.Entry<BigDecimal, TreeMap<Double, Pair<Double, Double>>> absV0RStdEntry : absV0RStd.entrySet()) {
                 builder = new StringBuilder();
                 builder.append(absV0RStdEntry.getKey());
-                for (Pair<Double, Double> rStd : absV0RStdEntry.getValue().values()) {
-                    builder.append("\t");
-                    builder.append(rStd.getKey()); // Mean
-                    builder.append("\t");
-                    builder.append(rStd.getValue()); // Std
+                for (Double v0 : v0s) {
+                    Pair<Double, Double> rStd = absV0RStdEntry.getValue().get(v0);
+                    if (rStd != null) {
+                        builder.append("\t");
+                        builder.append(rStd.getKey()); // Mean
+                        builder.append("\t");
+                        builder.append(rStd.getValue()); // Std
+                    } else {
+                        builder.append("\tnull\tnull");
+                    }
                 }
 
                 writer.write(builder + "\n");
