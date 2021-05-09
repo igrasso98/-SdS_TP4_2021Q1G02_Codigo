@@ -4,10 +4,7 @@ import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.RadiationInput;
-import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationEnergySerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationEscapeProportionSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationTrajectorySerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.*;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
@@ -47,9 +44,9 @@ public class App {
     public static void main(String[] args) throws ParseException, IOException {
         CommandParser.getInstance().parse(args);
 
-//        System.out.println("------------- OSCILLATOR -------------");
-//        App.oscillatorSimulation();
-//        System.out.println("--------------------------------------");
+        System.out.println("------------- OSCILLATOR -------------");
+        App.oscillatorSimulation();
+        System.out.println("--------------------------------------");
 
         System.out.println("------------- RADIATION -------------");
         App.radiationSimulation();
@@ -191,28 +188,6 @@ public class App {
                 dt
         );
 
-//        radiation.addSerializer(new OvitoSerializer(
-//                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
-//                        ":2:Velocity:R:2:color:R:3",
-//                (particle, step) -> {
-//                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
-//                    String s = particle.getId() + "\t" +
-//                            App.RADIATION_RADIUS + "\t" +
-//                            particle.getPosition().getX() / Constants.D + "\t" +
-//                            particle.getPosition().getY() / Constants.D + "\t" +
-//                            particle.getVelocity().getxSpeed() / Constants.D + "\t" +
-//                            particle.getVelocity().getySpeed() / Constants.D + "\t";
-//
-//                    Color color = getParticleColor(particle);
-//                    s += color.getRed() + "\t" +
-//                            color.getGreen() + "\t" +
-//                            color.getBlue();
-//
-//                    return s;
-//                },
-//                step -> "R:/output/radiation_1_" + dt + "_" + step + ".xyz",
-//                App.RADIATION_SERIALIZE_EVERY
-//        ));
         radiation.addSerializer(App.RADIATION_2_ENERGY_SERIALIZER);
 
         System.out.println("Simulating radiation with dt = " + dt);
@@ -226,7 +201,7 @@ public class App {
         for (double v0 : App.RADIATION_V0S) {
             System.out.println("Simulating radiation 3 with v0 = " + v0);
             for (double yOffset: App.RADIATION_Y_OFFSETS) {
-                App.radiationSimulation3_4(v0, yOffset * Constants.D);
+                App.radiationSimulation3_4(v0, yOffset);
             }
         }
 
@@ -236,7 +211,7 @@ public class App {
 
     private static void radiationSimulation3_4(double V0, double yOffset) throws IOException {
         RadiationInput radiationInput = ParticleParser.parseParticles(CommandParser.getInstance().getInputPath(), new Position(Constants.D, 0));
-        Particle impactParticle = App.getImpactParticle(V0, yOffset);
+        Particle impactParticle = App.getImpactParticle(V0, yOffset * Constants.D);
 
         Collection<Particle> particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL);
         for (Particle[] row : radiationInput.getParticles()) {
@@ -249,6 +224,29 @@ public class App {
                 new BeemanAlgorithm(new ParticleElectrostaticForceCalculator(particles)),
                 App.RADIATION_DT
         );
+
+        radiation.addSerializer(new OvitoSerializer(
+                (systemParticles, step) -> systemParticles.size() + "\n" + "Properties=id:R:1:radius:R:1:pos:R" +
+                        ":2:Velocity:R:2:color:R:3",
+                (particle, step) -> {
+                    // id (1), radius (1), pos (2), size (1), color (3, RGB)";
+                    String s = particle.getId() + "\t" +
+                            App.RADIATION_RADIUS + "\t" +
+                            particle.getPosition().getX() / Constants.D + "\t" +
+                            particle.getPosition().getY() / Constants.D + "\t" +
+                            particle.getVelocity().getxSpeed() / Constants.D + "\t" +
+                            particle.getVelocity().getySpeed() / Constants.D + "\t";
+
+                    Color color = getParticleColor(particle);
+                    s += color.getRed() + "\t" +
+                            color.getGreen() + "\t" +
+                            color.getBlue();
+
+                    return s;
+                },
+                step -> "R:/output/radiation_3_" + V0 + "_" + yOffset + "_" + step + ".xyz",
+                App.RADIATION_SERIALIZE_EVERY
+        ));
 
         radiation.addSerializer(App.RADIATION_3_TRAJECTORY_SERIALIZER);
         radiation.addSerializer(App.RADIATION_4_FACTOR_SERIALIZER);
