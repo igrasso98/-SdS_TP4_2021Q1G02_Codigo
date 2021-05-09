@@ -24,7 +24,7 @@ public class App {
     private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
 
     private static final double RADIATION_DT = 1e-14;
-    private static final double RADIATION_RADIUS = 0.01;
+    private static final double RADIATION_RADIUS = 0.2;
     private static final double RADIATION_SERIALIZE_EVERY = 1e-14;
 
     public static void main(String[] args) throws ParseException, IOException {

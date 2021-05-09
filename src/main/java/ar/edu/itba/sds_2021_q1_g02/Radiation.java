@@ -15,6 +15,7 @@ public class Radiation extends Simulation {
     private final IntegrationAlgorithm integrationAlgorithm;
     private final EnergyCalculator energyCalculator;
     private final double dt;
+    private boolean impactParticleInsideMaterial = false;
 
     public Radiation(Particle[][] particlesMatrix, Particle impactParticle, IntegrationAlgorithm integrationAlgorithm
             , double dt) {
@@ -43,10 +44,13 @@ public class Radiation extends Simulation {
         while (this.continueSimulation()) {
             step = this.simulateStep(step);
             double energy = this.energyCalculator.calculateTotalEnergy(this.impactParticle);
-            //HAY QUE GRAFICAR LOS VALORES QUE IMPRIMO ABAJO -> energyT0-energy
+            // TODO: HAY QUE GRAFICAR LOS VALORES QUE IMPRIMO ABAJO -> energyT0-energy
             System.out.println(Math.abs(energyT0 - energy));
-            if (step.getAbsoluteTime() >= 5e-12)
+            if (!this.continueSimulation())
                 step.setLastStep(true);
+            if (!this.impactParticleInsideMaterial && this.impactParticle.getPosition().getX() >= Constants.D) {
+                this.impactParticleInsideMaterial = true;
+            }
 
             this.serialize(this.particles, step);
         }
@@ -87,7 +91,7 @@ public class Radiation extends Simulation {
     }
 
     private boolean isImpactParticleInside() {
-        return this.impactParticle.getPosition().getX() >= 0
+        return this.impactParticle.getPosition().getX() >= (this.impactParticleInsideMaterial ? Constants.D : 0)
                 && this.impactParticle.getPosition().getX() <= (Constants.L + Constants.D)
                 && this.impactParticle.getPosition().getY() >= 0
                 && this.impactParticle.getPosition().getY() <= Constants.L;
