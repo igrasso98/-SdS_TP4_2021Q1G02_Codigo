@@ -37,7 +37,7 @@ def parse_args():
             print('v0 is too small or too large')
             quit()
 
-        y_offset = int(sys.argv[2])
+        y_offset = float(sys.argv[2])
         if not (Y_OFFSET_MIN <= y_offset <= Y_OFFSET_MAX):
             print('y_offset is too small or too large')
             quit()

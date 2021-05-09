@@ -24,7 +24,7 @@ public class App {
     private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
 
     private static final double RADIATION_DT = 1e-14;
-    private static final double RADIATION_RADIUS = 0.25;
+    private static final double RADIATION_RADIUS = 0.01;
     private static final double RADIATION_SERIALIZE_EVERY = 1e-14;
 
     public static void main(String[] args) throws ParseException, IOException {
@@ -221,7 +221,7 @@ public class App {
                 0,
                 0,
                 Constants.RADIATION_PARTICLE_MASS,
-                Constants.RADIATION_PARTICLE_POSITION.add(new Position(0, -1 * Constants.D)),
+                Constants.RADIATION_PARTICLE_POSITION.add(new Position(0, yOffset)),
                 new Velocity(V0, 0),
                 ParticleCharge.POSITIVE
         );
