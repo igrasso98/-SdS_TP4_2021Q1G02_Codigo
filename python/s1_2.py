@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-DT_S = [0.01, 0.001, 1e-4, 1e-5, 1e-6]
-DT_S_STRING = ['0.01', '0.001', '1.0E-4', '1.0E-5', '1.0E-6']
+DT_S = [0.01, 0.001, 1e-4, 1e-5, 1e-6, 1e-7]
+DT_S_STRING = ['0.01', '0.001', '1.0E-4', '1.0E-5', '1.0E-6', '1.0E-7']
 
 
 def internal_graph_system(data, label, color):

@@ -16,16 +16,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class App {
-    private static final double OSCILLATOR_DT = 0.0001;
-    private static final double OSCILLATOR_SERIALIZE_EVERY = 0.01;
+    private static final double OSCILLATOR_DT = 1e-5;
+    private static final double OSCILLATOR_SERIALIZE_EVERY = 1e-3;
     private static final OscillatorSerializer OSCILLATOR_SERIALIZER = new OscillatorSerializer(
             step -> "R:/output/oscillator_1.tsv",
             App.OSCILLATOR_SERIALIZE_EVERY
     );
     private static final DampedOscillatorForceCalculator DAMPED_FORCE = new DampedOscillatorForceCalculator(10000, 100);
-    private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6};
+    private static final double[] OSCILLATOR_DTS = {0.01, 0.001, 1e-4, 1e-5, 1e-6, 1e-7};
 
-    private static final double RADIATION_DT = 1e-14;
+    private static final double RADIATION_DT = 1e-16;
     private static final double RADIATION_RADIUS = 0.2;
     private static final double RADIATION_SERIALIZE_EVERY = 1e-14;
     private static final double[] RADIATION_DTS = {1e-14, 1e-15, 1e-16, 1e-17, 1e-18};
@@ -47,9 +47,9 @@ public class App {
     public static void main(String[] args) throws ParseException, IOException {
         CommandParser.getInstance().parse(args);
 
-        System.out.println("------------- OSCILLATOR -------------");
-        App.oscillatorSimulation();
-        System.out.println("--------------------------------------");
+//        System.out.println("------------- OSCILLATOR -------------");
+//        App.oscillatorSimulation();
+//        System.out.println("--------------------------------------");
 
         System.out.println("------------- RADIATION -------------");
         App.radiationSimulation();
