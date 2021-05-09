@@ -6,7 +6,7 @@ import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.RadiationInput;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
-import ar.edu.itba.sds_2021_q1_g02.serializer.RadiatorEnergySerializer;
+import ar.edu.itba.sds_2021_q1_g02.serializer.RadiationEnergySerializer;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
@@ -27,9 +27,9 @@ public class App {
     private static final double RADIATION_DT = 1e-14;
     private static final double RADIATION_RADIUS = 0.2;
     private static final double RADIATION_SERIALIZE_EVERY = 1e-14;
-    private static final double[] RADIATION_DTS = {1e-14, 1e-15, 1e-16};
-    private static final RadiatorEnergySerializer RADIATOR_2_ENERGY_SERIALIZER = new RadiatorEnergySerializer(
-            step -> "R:/output/radiator_2.tsv",
+    private static final double[] RADIATION_DTS = {1e-14, 1e-15, 1e-16, 1e-17};
+    private static final RadiationEnergySerializer RADIATION_2_ENERGY_SERIALIZER = new RadiationEnergySerializer(
+            step -> "R:/output/radiation_2.tsv",
             App.RADIATION_SERIALIZE_EVERY
     );
 
@@ -156,13 +156,13 @@ public class App {
     }
 
     private static void radiationSimulation1_2() throws IOException {
-        App.RADIATOR_2_ENERGY_SERIALIZER.reset();
+        App.RADIATION_2_ENERGY_SERIALIZER.reset();
 
         for (double dt : App.RADIATION_DTS) {
             App.radiationSimulation1_2(dt);
         }
 
-        App.RADIATOR_2_ENERGY_SERIALIZER.finish();
+        App.RADIATION_2_ENERGY_SERIALIZER.finish();
     }
 
     private static void radiationSimulation1_2(double dt) throws IOException {
@@ -203,7 +203,7 @@ public class App {
                 step -> "R:/output/radiation_1_" + dt + "_" + step + ".xyz",
                 App.RADIATION_SERIALIZE_EVERY
         ));
-        radiation.addSerializer(App.RADIATOR_2_ENERGY_SERIALIZER);
+        radiation.addSerializer(App.RADIATION_2_ENERGY_SERIALIZER);
 
         System.out.println("Simulating radiation with dt = " + dt);
         radiation.simulate();

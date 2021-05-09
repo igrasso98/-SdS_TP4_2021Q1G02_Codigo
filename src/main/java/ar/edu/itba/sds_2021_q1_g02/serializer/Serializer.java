@@ -4,16 +4,16 @@ import ar.edu.itba.sds_2021_q1_g02.models.IntegrationAlgorithm;
 import ar.edu.itba.sds_2021_q1_g02.models.Particle;
 import ar.edu.itba.sds_2021_q1_g02.models.Step;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public abstract class Serializer {
-    public static final double INFINITE_TIME = Double.POSITIVE_INFINITY;
-
-    private final double serializeEvery;
-    private double lastSerialized = 0;
+    protected final double serializeEvery;
+    private BigDecimal lastSerialized;
 
     public Serializer(double serializeEvery) {
         this.serializeEvery = serializeEvery;
+        this.restartCount();
     }
 
     public void serializeSystem(Collection<Particle> particles, IntegrationAlgorithm integrationAlgorithm) {}
@@ -24,9 +24,8 @@ public abstract class Serializer {
         if (step.getStep() == 0)
             return true;
 
-        this.lastSerialized = this.lastSerialized + step.getRelativeTime();
-        if (this.lastSerialized - this.serializeEvery >= 0 || step.isLastStep()) {
-            this.restartCount();
+        if (step.getAbsoluteTime().subtract(this.lastSerialized).doubleValue() >= this.serializeEvery || step.isLastStep()) {
+            this.lastSerialized = step.getAbsoluteTime();
             return true;
         }
 
@@ -34,6 +33,6 @@ public abstract class Serializer {
     }
 
     protected void restartCount() {
-        this.lastSerialized = 0;
+        this.lastSerialized = BigDecimal.ZERO;
     }
 }

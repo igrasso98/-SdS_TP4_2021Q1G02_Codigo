@@ -3,6 +3,7 @@ package ar.edu.itba.sds_2021_q1_g02;
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 import javafx.util.Pair;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +15,7 @@ public class Radiation extends Simulation {
     private final Particle impactParticle;
     private final IntegrationAlgorithm integrationAlgorithm;
     private final EnergyCalculator energyCalculator;
-    private final double dt;
+    private final BigDecimal dt;
     private boolean impactParticleInsideMaterial = false;
 
     public Radiation(Particle[][] particlesMatrix, Particle impactParticle, IntegrationAlgorithm integrationAlgorithm
@@ -22,7 +23,7 @@ public class Radiation extends Simulation {
         this.particlesMatrix = particlesMatrix;
         this.impactParticle = impactParticle;
         this.integrationAlgorithm = integrationAlgorithm;
-        this.dt = dt;
+        this.dt = BigDecimal.valueOf(dt);
 
         this.particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL + 1);
         for (Particle[] row : this.particlesMatrix) {
@@ -37,15 +38,15 @@ public class Radiation extends Simulation {
     public void simulate() {
         this.serializeSystem(this.particles, this.integrationAlgorithm);
         double energyT0 = this.energyCalculator.calculateTotalEnergy(this.impactParticle);
-        System.out.println(energyT0);
+
         Step step = this.calculateFirstStep();
+        step.setEnergyDifference(0);
         this.serialize(this.particles, step);
 
         while (this.continueSimulation()) {
             step = this.simulateStep(step);
-            double energy = this.energyCalculator.calculateTotalEnergy(this.impactParticle);
-            // TODO: HAY QUE GRAFICAR LOS VALORES QUE IMPRIMO ABAJO -> energyT0-energy
-            System.out.println(Math.abs(energyT0 - energy));
+            step.setEnergyDifference(Math.abs(energyT0 - this.energyCalculator.calculateTotalEnergy(this.impactParticle)));
+
             if (!this.continueSimulation())
                 step.setLastStep(true);
             if (!this.impactParticleInsideMaterial && this.impactParticle.getPosition().getX() >= Constants.D) {
@@ -61,7 +62,7 @@ public class Radiation extends Simulation {
                 this.particles.stream().collect(Collectors.toMap(particle -> particle, Particle::getPosition)),
                 this.particles.stream().collect(Collectors.toMap(particle -> particle, Particle::getVelocity)),
                 this.dt,
-                previousStep.getAbsoluteTime() + this.dt,
+                previousStep.getAbsoluteTime().add(this.dt),
                 previousStep.getStep() + 1,
                 this.integrationAlgorithm
         );
@@ -80,14 +81,14 @@ public class Radiation extends Simulation {
                 this.particles.stream().collect(Collectors.toMap(particle -> particle, Particle::getPosition)),
                 this.particles.stream().collect(Collectors.toMap(particle -> particle, Particle::getVelocity)),
                 this.dt,
-                0,
+                BigDecimal.ZERO,
                 0,
                 this.integrationAlgorithm
         );
     }
 
     private boolean continueSimulation() {
-        return this.isImpactParticleInside() || this.isImpactParticleTooClose();
+        return this.isImpactParticleInside() && !this.isImpactParticleTooClose();
     }
 
     private boolean isImpactParticleInside() {
