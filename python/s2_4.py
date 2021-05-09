@@ -23,7 +23,7 @@ def graph_factors(factors, v0s):
     ]
     internal_graph_system(v0s, factors, colors[0])
 
-    plt.xlabel('|V0| * 10^3 [m/s]')
+    plt.xlabel('|Velocidad inicial| * 10^3 [m/s]')
     plt.ylabel('Proporcion particulas que escapan')
     plt.xticks(v0s, [str(int(v0 / 1000)) for v0 in v0s])
     # plt.legend(loc='upper right')
