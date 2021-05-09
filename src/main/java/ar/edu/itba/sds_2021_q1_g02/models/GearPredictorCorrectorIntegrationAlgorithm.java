@@ -36,13 +36,13 @@ public class GearPredictorCorrectorIntegrationAlgorithm implements IntegrationAl
 
         List<Pair<Double, Double>> derivatives = this.calculateDerivatives(particle);
 
-        List<Pair<Double, Double>> predictions = this.predict(derivatives, step.getRelativeTime());
+        List<Pair<Double, Double>> predictions = this.predict(derivatives, step.getRelativeTime().doubleValue());
 
 
-        Pair<Double, Double> deltaR2 = this.calculateDeltaR2(predictions, particle.getMass(), step.getRelativeTime());
+        Pair<Double, Double> deltaR2 = this.calculateDeltaR2(predictions, particle.getMass(), step.getRelativeTime().doubleValue());
 
         List<Pair<Double, Double>> corrections = this.correct(predictions, deltaR2,
-                step.getRelativeTime());
+                step.getRelativeTime().doubleValue());
 
         return corrections;
     }

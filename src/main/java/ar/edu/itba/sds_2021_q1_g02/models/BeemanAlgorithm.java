@@ -17,8 +17,8 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
 
         if (!step.containsPreviousPosition(particle)) {
             Step previousStep = step.copy();
-            previousStep.setAbsoluteTime(previousStep.getAbsoluteTime() - previousStep.getRelativeTime());
-            previousStep.setRelativeTime(-1 * previousStep.getRelativeTime());
+            previousStep.setAbsoluteTime(previousStep.getAbsoluteTime().subtract(previousStep.getRelativeTime()));
+            previousStep.setRelativeTime(previousStep.getRelativeTime().negate());
             Pair<Position, Velocity> previousParticlePositionAndVelocity = this.euler.perform(previousParticleState,
                     previousStep);
             previousParticleState.setPosition(previousParticlePositionAndVelocity.getKey());
@@ -28,18 +28,18 @@ public class BeemanAlgorithm implements IntegrationAlgorithm {
             previousParticleState.setVelocity(step.getPreviousVelocity(particle));
         }
 
-        Position newPosition = this.calculatePositions(step.getRelativeTime(), particle, previousParticleState);
+        Position newPosition = this.calculatePositions(step.getRelativeTime().doubleValue(), particle, previousParticleState);
 
         Particle nextParticleState = particle.copy();
         nextParticleState.setPosition(newPosition);
 
         if (this.forceCalculator.isVelocityDependant()) {
-            Velocity predictedVelocity = this.calculatePredictedVelocities(step.getRelativeTime(), particle,
+            Velocity predictedVelocity = this.calculatePredictedVelocities(step.getRelativeTime().doubleValue(), particle,
                     previousParticleState);
             nextParticleState.setVelocity(predictedVelocity);
         }
 
-        Velocity correctedVelocity = this.calculateCorrectedVelocities(step.getRelativeTime(), particle,
+        Velocity correctedVelocity = this.calculateCorrectedVelocities(step.getRelativeTime().doubleValue(), particle,
                 previousParticleState, nextParticleState);
 
         return new Pair<>(newPosition, correctedVelocity);

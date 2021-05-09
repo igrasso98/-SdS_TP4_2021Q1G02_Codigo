@@ -1,21 +1,20 @@
 package ar.edu.itba.sds_2021_q1_g02.models;
 
-import javafx.util.Pair;
-
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class Step {
     private final Map<Particle, Position> previousParticlesPosition;
     private final Map<Particle, Velocity> previousParticlesVelocity;
-    private double deltaTime;
-    private double absoluteTime;
+    private BigDecimal deltaTime;
+    private BigDecimal absoluteTime;
     private final int step;
     private final IntegrationAlgorithm integrationAlgorithm;
+    private double energyDifference;
     private boolean isLastStep = false;
 
     public Step(Map<Particle, Position> previousParticlesPosition, Map<Particle,
-            Velocity> previousParticlesVelocity, double deltaTime, double absoluteTime, int step,
+            Velocity> previousParticlesVelocity, BigDecimal deltaTime, BigDecimal absoluteTime, int step,
                 IntegrationAlgorithm integrationAlgorithm) {
         this.previousParticlesPosition = previousParticlesPosition;
         this.previousParticlesVelocity = previousParticlesVelocity;
@@ -26,11 +25,11 @@ public class Step {
         this.integrationAlgorithm = integrationAlgorithm;
     }
 
-    public double getRelativeTime() {
+    public BigDecimal getRelativeTime() {
         return this.deltaTime;
     }
 
-    public double getAbsoluteTime() {
+    public BigDecimal getAbsoluteTime() {
         return this.absoluteTime;
     }
 
@@ -54,6 +53,14 @@ public class Step {
         return this.previousParticlesVelocity.get(particle);
     }
 
+    public double getEnergyDifference() {
+        return this.energyDifference;
+    }
+
+    public void setEnergyDifference(double energyDifference) {
+        this.energyDifference = energyDifference;
+    }
+
     public boolean containsPreviousVelocity(Particle particle) {
         return this.previousParticlesVelocity.containsKey(particle);
     }
@@ -69,11 +76,11 @@ public class Step {
         );
     }
 
-    public void setAbsoluteTime(double absoluteTime) {
+    public void setAbsoluteTime(BigDecimal absoluteTime) {
         this.absoluteTime = absoluteTime;
     }
 
-    public void setRelativeTime(double relativeTime) {
+    public void setRelativeTime(BigDecimal relativeTime) {
         this.deltaTime = relativeTime;
     }
 

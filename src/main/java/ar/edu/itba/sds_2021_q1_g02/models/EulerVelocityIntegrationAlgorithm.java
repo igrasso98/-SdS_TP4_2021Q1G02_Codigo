@@ -15,12 +15,12 @@ public class EulerVelocityIntegrationAlgorithm implements IntegrationAlgorithm {
         Pair<Double, Double> force = this.forceCalculator.calculatePair(particle);
 
         Velocity newVelocity = new Velocity(
-                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step.getRelativeTime(), force.getKey()),
-                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step.getRelativeTime(), force.getValue())
+                this.calculateVelocity(particle, particle.getVelocity().getxSpeed(), step.getRelativeTime().doubleValue(), force.getKey()),
+                this.calculateVelocity(particle, particle.getVelocity().getySpeed(), step.getRelativeTime().doubleValue(), force.getValue())
         );
         Position newPosition = new Position(
-                this.calculatePosition(particle, newVelocity.getxSpeed(), particle.getPosition().getX(), step.getRelativeTime(), force.getKey()),
-                this.calculatePosition(particle, newVelocity.getySpeed(), particle.getPosition().getY(), step.getRelativeTime(), force.getValue())
+                this.calculatePosition(particle, newVelocity.getxSpeed(), particle.getPosition().getX(), step.getRelativeTime().doubleValue(), force.getKey()),
+                this.calculatePosition(particle, newVelocity.getySpeed(), particle.getPosition().getY(), step.getRelativeTime().doubleValue(), force.getValue())
         );
 
         return new Pair<>(newPosition, newVelocity);

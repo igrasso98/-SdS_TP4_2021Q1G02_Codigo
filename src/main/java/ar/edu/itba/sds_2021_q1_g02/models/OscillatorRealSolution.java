@@ -7,8 +7,8 @@ public class OscillatorRealSolution implements IntegrationAlgorithm {
     public Pair<Position, Velocity> perform(Particle particle, Step step) {
         return new Pair<>(
                 new Position(
-                        Math.exp(-(50 / particle.getMass()) * step.getAbsoluteTime())
-                                * Math.cos(Math.sqrt((1e4 / particle.getMass()) - (10000 / (4 * Math.pow(particle.getMass(), 2)))) * step.getAbsoluteTime()),
+                        Math.exp(-(50 / particle.getMass()) * step.getAbsoluteTime().doubleValue())
+                                * Math.cos(Math.sqrt((1e4 / particle.getMass()) - (10000 / (4 * Math.pow(particle.getMass(), 2)))) * step.getAbsoluteTime().doubleValue()),
                         0
                 ),
                 new Velocity(

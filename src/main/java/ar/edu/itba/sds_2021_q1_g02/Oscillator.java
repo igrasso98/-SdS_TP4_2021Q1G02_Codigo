@@ -3,18 +3,19 @@ package ar.edu.itba.sds_2021_q1_g02;
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 import javafx.util.Pair;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 public class Oscillator extends Simulation {
     private final Particle particle;
     private final IntegrationAlgorithm integrationAlgorithm;
-    private final double dt;
+    private final BigDecimal dt;
     private final double maxTime;
 
     public Oscillator(Particle particle, IntegrationAlgorithm integrationAlgorithm, double dt, double maxTime) {
         this.particle = particle;
         this.integrationAlgorithm = integrationAlgorithm;
-        this.dt = dt;
+        this.dt = BigDecimal.valueOf(dt);
         this.maxTime = maxTime;
     }
 
@@ -24,9 +25,9 @@ public class Oscillator extends Simulation {
         Step step = this.calculateFirstStep();
         this.serialize(Collections.singletonList(this.particle), step);
 
-        while (step.getAbsoluteTime() < this.maxTime) {
+        while (step.getAbsoluteTime().doubleValue() < this.maxTime) {
             step = this.simulateStep(step);
-            if (step.getAbsoluteTime() >= this.maxTime)
+            if (step.getAbsoluteTime().doubleValue() >= this.maxTime)
                 step.setLastStep(true);
 
             this.serialize(Collections.singletonList(this.particle), step);
@@ -38,7 +39,7 @@ public class Oscillator extends Simulation {
                 Collections.singletonMap(this.particle, this.particle.getPosition()),
                 Collections.singletonMap(this.particle, this.particle.getVelocity()),
                 this.dt,
-                previousStep.getAbsoluteTime() + this.dt,
+                previousStep.getAbsoluteTime().add(this.dt),
                 previousStep.getStep() + 1,
                 this.integrationAlgorithm
         );
@@ -56,7 +57,7 @@ public class Oscillator extends Simulation {
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 this.dt,
-                0,
+                BigDecimal.ZERO,
                 0,
                 this.integrationAlgorithm
         );

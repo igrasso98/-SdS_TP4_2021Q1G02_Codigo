@@ -17,8 +17,8 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
 
         if (!step.containsPreviousPosition(particle)) {
             Step previousStep = step.copy();
-            previousStep.setAbsoluteTime(previousStep.getAbsoluteTime() - previousStep.getRelativeTime());
-            previousStep.setRelativeTime(-1 * previousStep.getRelativeTime());
+            previousStep.setAbsoluteTime(previousStep.getAbsoluteTime().subtract(previousStep.getRelativeTime()));
+            previousStep.setRelativeTime(previousStep.getRelativeTime().negate());
             Pair<Position, Velocity> previousParticlePositionAndVelocity = this.euler.perform(previousParticleState,
                     previousStep);
             previousParticleState.setPosition(previousParticlePositionAndVelocity.getKey());
@@ -40,11 +40,11 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     private Position calculatePositions(Step step, Particle particle, Particle previousParticleState) {
         Pair<Double, Double> force = this.forceCalculator.calculatePair(particle);
 
-        double positionX = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getX(),
+        double positionX = this.calculatePosition(step.getRelativeTime().doubleValue(), particle.getPosition().getX(),
                 previousParticleState.getPosition().getX(), force.getKey(),
                 particle.getMass());
 
-        double positionY = this.calculatePosition(step.getRelativeTime(), particle.getPosition().getY(),
+        double positionY = this.calculatePosition(step.getRelativeTime().doubleValue(), particle.getPosition().getY(),
                 previousParticleState.getPosition().getY(), force.getValue(),
                 particle.getMass());
 
@@ -52,9 +52,9 @@ public class VerletIntegrationAlgorithm implements IntegrationAlgorithm {
     }
 
     private Velocity calculateVelocities(Step step, Particle previousParticleState, Position nextPosition) {
-        double velocityX = this.calculateVelocity(step.getRelativeTime(),
+        double velocityX = this.calculateVelocity(step.getRelativeTime().doubleValue(),
                 previousParticleState.getPosition().getX(), nextPosition.getX());
-        double velocityY = this.calculateVelocity(step.getRelativeTime(),
+        double velocityY = this.calculateVelocity(step.getRelativeTime().doubleValue(),
                 previousParticleState.getPosition().getY(), nextPosition.getY());
 
         return new Velocity(velocityX, velocityY);
