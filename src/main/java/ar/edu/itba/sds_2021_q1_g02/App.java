@@ -3,9 +3,9 @@ package ar.edu.itba.sds_2021_q1_g02;
 import ar.edu.itba.sds_2021_q1_g02.models.*;
 import ar.edu.itba.sds_2021_q1_g02.parsers.CommandParser;
 import ar.edu.itba.sds_2021_q1_g02.parsers.ParticleParser;
+import ar.edu.itba.sds_2021_q1_g02.parsers.RadiationInput;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OscillatorSerializer;
 import ar.edu.itba.sds_2021_q1_g02.serializer.OvitoSerializer;
-import javafx.util.Pair;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
@@ -111,18 +111,18 @@ public class App {
     }
 
     private static void radiationSimulation() throws IOException {
-        Pair<Particle[][], Double> particlesAndV0 = ParticleParser.parseParticles(CommandParser.getInstance().getInputPath(), new Position(Constants.D, 0));
-        Particle impactParticle = App.getImpactParticle(particlesAndV0.getValue());
+        RadiationInput radiationInput = ParticleParser.parseParticles(CommandParser.getInstance().getInputPath(), new Position(Constants.D, 0));
+        Particle impactParticle = App.getImpactParticle(radiationInput.getV0(), radiationInput.getyOffset());
 
         Collection<Particle> particles = new ArrayList<>(Constants.N_PARTICLES_TOTAL);
-        for (Particle[] row : particlesAndV0.getKey()) {
+        for (Particle[] row : radiationInput.getParticles()) {
             particles.addAll(Arrays.asList(row));
         }
 
         Radiation radiation = new Radiation(
-                particlesAndV0.getKey(),
+                radiationInput.getParticles(),
                 impactParticle,
-                new EulerIntegrationAlgorithm(new ParticleElectrostaticForceCalculator(particles)),
+                new BeemanAlgorithm(new ParticleElectrostaticForceCalculator(particles)),
                 App.RADIATION_DT
         );
 
@@ -216,12 +216,12 @@ public class App {
         );
     }
 
-    private static Particle getImpactParticle(double V0) {
+    private static Particle getImpactParticle(double V0, double yOffset) {
         return new Particle(
                 0,
                 0,
                 Constants.RADIATION_PARTICLE_MASS,
-                Constants.RADIATION_PARTICLE_POSITION.copy(),
+                Constants.RADIATION_PARTICLE_POSITION.add(new Position(0, -1 * Constants.D)),
                 new Velocity(V0, 0),
                 ParticleCharge.POSITIVE
         );

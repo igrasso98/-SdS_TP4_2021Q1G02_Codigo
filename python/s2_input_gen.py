@@ -14,6 +14,8 @@ N_SIDE = 16
 M = 10 ** -27
 V0_MIN = 10000
 V0_MAX = 100000
+Y_OFFSET_MIN = -1
+Y_OFFSET_MAX = 1
 
 
 def get_charge(x, y):
@@ -22,24 +24,35 @@ def get_charge(x, y):
 
 def parse_args():
     total = len(sys.argv)
-    if total > 2:
-        print("Only 1 argument is supported: 1. specifies V0 (blank for random between [" + str(V0_MIN) + ", " + str(V0_MAX) + "]")
+    if total > 3:
+        print("""
+        Only 2 arguments are supported: 
+        1. specifies V0 (blank for random between [{}, {}]
+        2. specifies yOffset multiplier for D (blank for random between [{}, {}]
+        """.format(V0_MIN, V0_MAX, Y_OFFSET_MIN, Y_OFFSET_MAX))
         quit()
-    if total == 2:
-        n = int(sys.argv[1])
-        if not (V0_MIN <= n <= V0_MAX):
+    if total == 3:
+        v0 = int(sys.argv[1])
+        if not (V0_MIN <= v0 <= V0_MAX):
             print('v0 is too small or too large')
             quit()
 
-        return n
+        y_offset = int(sys.argv[2])
+        if not (Y_OFFSET_MIN <= y_offset <= Y_OFFSET_MAX):
+            print('y_offset is too small or too large')
+            quit()
+
+        return v0, y_offset * D
 
     random.seed()
-    return random.uniform(V0_MIN, V0_MAX)
+    return random.uniform(V0_MIN, V0_MAX), random.uniform(Y_OFFSET_MIN, Y_OFFSET_MAX) * D
 
 
-def generate(file_path, velocity):
+def generate(file_path, velocity, y_offset):
     f = open(file_path, "w")
     f.write(str(velocity))
+    f.write('\n')
+    f.write(str(y_offset))
     f.write('\n')
 
     for y in range(N_SIDE):
@@ -61,9 +74,9 @@ def generate(file_path, velocity):
 
 
 def main():
-    velocity = parse_args()
+    velocity, y_offset = parse_args()
     file_path = '../input.txt'
-    generate(file_path, velocity)
+    generate(file_path, velocity, y_offset)
     
 
 if __name__ == '__main__':
