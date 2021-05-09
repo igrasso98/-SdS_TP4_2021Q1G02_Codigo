@@ -13,9 +13,11 @@ public class Radiation extends Simulation {
     private final Collection<Particle> particles;
     private final Particle impactParticle;
     private final IntegrationAlgorithm integrationAlgorithm;
+    private final EnergyCalculator energyCalculator;
     private final double dt;
 
-    public Radiation(Particle[][] particlesMatrix, Particle impactParticle, IntegrationAlgorithm integrationAlgorithm, double dt) {
+    public Radiation(Particle[][] particlesMatrix, Particle impactParticle, IntegrationAlgorithm integrationAlgorithm
+            , double dt) {
         this.particlesMatrix = particlesMatrix;
         this.impactParticle = impactParticle;
         this.integrationAlgorithm = integrationAlgorithm;
@@ -27,16 +29,22 @@ public class Radiation extends Simulation {
             this.particles.addAll(rowCollection);
         }
         this.particles.add(impactParticle);
+        this.energyCalculator = new ParticleElectrostaticEnergyCalculator(this.particles);
     }
 
     @Override
     public void simulate() {
         this.serializeSystem(this.particles, this.integrationAlgorithm);
+        double energyT0 = this.energyCalculator.calculateTotalEnergy(this.impactParticle);
+        System.out.println(energyT0);
         Step step = this.calculateFirstStep();
         this.serialize(this.particles, step);
 
         while (this.continueSimulation()) {
             step = this.simulateStep(step);
+            double energy = this.energyCalculator.calculateTotalEnergy(this.impactParticle);
+            //HAY QUE GRAFICAR LOS VALORES QUE IMPRIMO ABAJO -> energyT0-energy
+            System.out.println(Math.abs(energyT0 - energy));
             if (step.getAbsoluteTime() >= 5e-12)
                 step.setLastStep(true);
 
@@ -54,7 +62,8 @@ public class Radiation extends Simulation {
                 this.integrationAlgorithm
         );
 
-        Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.impactParticle, previousStep);
+        Pair<Position, Velocity> newVelocityPositions = this.integrationAlgorithm.perform(this.impactParticle,
+                previousStep);
 
         this.impactParticle.setPosition(newVelocityPositions.getKey());
         this.impactParticle.setVelocity(newVelocityPositions.getValue());
